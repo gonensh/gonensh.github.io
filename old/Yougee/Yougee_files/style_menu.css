@@ -1,0 +1,135 @@
+
+
+
+
+
+/*
+     FILE ARCHIVED ON 18:19:37 Jun 17, 2013 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 14:41:15 Sep 27, 2013.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+*/
+* {
+	margin: 0;
+	padding: 0;
+}
+a {
+	text-decoration: none;
+}
+ul {
+	list-style: none;
+}
+.sub_menu .dropdown{
+transition-property:height;
+transition-duration:1s;
+transition-timing-function:ease;
+transition-delay:.5s;
+/* Firefox 4 */
+-moz-transition-property:height;
+-moz-transition-duration:1s;
+-moz-transition-timing-function:ease;
+-moz-transition-delay:.5s;
+/* Safari and Chrome */
+-webkit-transition-property:height;
+-webkit-transition-duration:1s;
+-webkit-transition-timing-function:ease;
+-webkit-transition-delay:.5s;
+/* Opera */
+-o-transition-property:height;
+-o-transition-duration:1s;
+-o-transition-timing-function:ease;
+-o-transition-delay:.5s;
+}
+
+/* 
+	LEVEL ONE
+*/
+ul.dropdown {
+	position: relative;
+	z-index:2;
+}
+ul.dropdown li {
+	font-weight: bold;
+	float: left;
+	zoom: 1;
+	//background:#63ae01;
+	width: 220px;
+}
+ul.dropdown a:hover {
+	color: #63ae01;
+
+}
+ul.dropdown a:active {
+	color: #ffa500;
+}
+ul.dropdown li a {
+	display: block;
+	padding: 4px 8px;
+	//border-right: 1px solid #333;
+	//color: #222;
+}
+ul.dropdown li:last-child a {
+	border-right: none;
+} /* Doesn't work in IE */
+ul.dropdown li.hover, ul.dropdown li:hover {
+	//background: #11AA11;
+	//color: #63ae01;
+	position: relative;
+}
+ul.sub_menu li.hover, ul.sub_menu li:hover {
+	background: #11AA11;
+	//color: #63ae01;
+	position: relative;
+	z-index:2;
+}
+
+ul.dropdown li.hover a {
+	color: white;
+	width:220px;
+}
+/* 
+	LEVEL TWO
+*/
+ul.dropdown ul {
+	width: 220px;
+	visibility: hidden;
+	position: absolute;
+	top: 100%;
+	left: 0;
+}
+ul.dropdown ul li {
+	font-weight: normal;
+	background: rgb(0,199,77);
+	color: #FFFFFF;
+	border-bottom: 1px solid #ccc;
+	float: none;
+	z-index:2;
+}
+ul.sub_menu ul li {
+	font-weight: normal;
+	background: rgb(0,199,77);
+	color: #FFFFFF;
+	border-bottom: 1px solid #ccc;
+	float: none;
+	z-index:2;
+}
+/* IE 6 & 7 Needs Inline Block */
+ul.dropdown ul li a {
+	border-right: none;
+	width: 100%;
+	display: inline-block;
+}
+/* 
+	LEVEL THREE
+*/
+ul.dropdown ul ul {
+	left: 20%;
+	top: 27px;
+	border: 5px;
+	border-color: white;
+}
+ul.dropdown li:hover > ul {
+	visibility: visible;
+}

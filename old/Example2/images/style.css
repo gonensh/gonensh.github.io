@@ -1,0 +1,38 @@
+.text {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #000000;
+}
+.orange
+{
+font-family:Verdana;
+color:#FDAA29;
+font-size:10px;
+font-weight:bold;
+}
+.welcome
+{
+font-family:ZapfChan Dm BT;
+color:#58A4BA;
+font-size:18px;
+font-weight: normal ;
+}
+.product {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	font-weight: bold;
+	color: #C56950;
+}
+.links {
+	font-family: Verdana;
+	font-size: 10px;
+	font-weight: bold;
+	color: #FFFFFF;
+}
+
+.footer {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #FFFFFF;
+}
+

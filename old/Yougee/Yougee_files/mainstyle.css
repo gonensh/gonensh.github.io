@@ -1,0 +1,1740 @@
+@charset "utf-8";
+/* CSS Document */
+body {
+	font: 75%/1.4 Verdana, Arial, Helvetica, sans-serif;
+	background-color:rgb(215,238,218);
+	margin: auto;
+	//width: 960px;
+	padding: 0;
+	color: #22BB22;
+}
+h1, h2, h3, h4, h5, h6 {
+	font-family:Calibri, Arial, Helvetica, sans-serif;
+	margin:0;
+	padding:0;
+	line-height:170%;
+	color:#6fc600;
+	text-decoration:none;
+}
+h1 {
+	font-size:24px;
+}
+h2 {
+	font-size:22px;
+}
+h3 {
+	font-size:16px;
+}
+h4 {
+	font-size:15px;
+}
+h5 {
+	font-size:14px;
+}
+h6 {
+	font-size:12px;
+}
+p, span, a {
+	margin:0;
+	padding:0;
+	line-height:125%;
+	font-size:15px;
+	font-family:Calibri, Arial, Helvetica, sans-serif;
+}
+span, a {
+	font-family:Calibri, Arial, Helvetica, sans-serif;
+	text-decoration:none;
+}
+p {
+	text-align:justify;
+	color:#2d2d2d;
+}
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+	font-family:inherit;
+	font-size:inherit;
+	font-weight:inherit;
+	font-style:inherit;
+	text-decoration:none;
+	color:inherit;
+}
+a img {
+	border:0 none;
+}
+.clear {
+	clear:both;
+	float:none;
+}
+a {
+	color: #FFFFFF;
+}
+a:link {
+
+	text-decoration: inherit;
+}
+a:hover {
+	color:#2d2d2d
+}
+ul {
+	margin:0;
+	padding:0;
+	list-style:none;
+}
+ul, ol, dl {
+	padding: 0;
+	margin: 0;
+}
+/*********** TOP**********************/
+
+.container {
+	width:960px;
+	background-color: rgb(215,238,218);
+	//background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/border.jpg) top repeat-y #fff;
+	margin: 0 auto;
+	margin-top:40px;
+	clear:both;
+	display:table;
+}
+.header {
+	width:100%;
+	background-color:rgb(0,199,77);
+	height:90px;
+}
+.contaner-header {
+	width:960px;
+	background-color:rgb(0,199,77);
+	height:90px;
+	margin: auto;
+}
+
+.logo {
+	width:239px;
+	height:65px;
+	float:left;
+	margin-top:15px;
+}
+.contaner-Search {
+	width:395px;
+	height:46px;
+	float:left;
+	//background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/sh.png) no-repeat;
+	margin:35px 0 0 35px;
+}
+.fild1 {
+	float: left;
+	height: 28px;
+	margin-top: 5px;
+	width: 319px;
+	color:#939393;
+	background:#fff;
+	//padding:5px;
+	margin-left:5px;
+	font:Arial, Helvetica, sans-serif;
+	font-size:18px;
+}
+.sh {
+	background: #f5f5f5;
+	color: #22bb22;
+	border-width: 1px;
+	border-color: #0C0C0C;
+	border-radius: 5px;
+	margin-top: 5px;
+	float: left;
+	height: 25px;
+	width: 50px;
+	cursor: pointer;
+}
+.sh:hover { background:#FCFCFC; }
+.sidebar1 {
+	float: left;
+	background-color: rgb(215,238,218);
+	width:147px;
+	padding-bottom: 10px;
+	padding:5px;
+	margin-right:5px;
+}
+.bg-icon1 a {
+	float:left;
+	width:68px;
+	height:68px;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/01.png) no-repeat;
+	line-height: 160px;
+	text-align: center;
+	text-decoration:none;
+	margin:25px 0 0 42px;
+	color:#42413C;
+}
+.bg-icon1 a:hover {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/1.png) no-repeat;
+}
+.bg-icon1-active a {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/1.jpg) no-repeat;
+}
+.bg-icon2 a {
+	float:left;
+	width:68px;
+	height:68px;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/02.png) no-repeat;
+	line-height: 160px;
+	text-align: center;
+	text-decoration:none;
+	margin:25px 0 0 42px;
+	color:#42413C;
+}
+.bg-icon2 a:hover {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/2.png) no-repeat;
+}
+.bg-icon2-active a {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/2.jpg) no-repeat;
+}
+.bg-icon3 a {
+	float:left;
+	width:68px;
+	height:68px;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/03.png) no-repeat;
+	line-height: 160px;
+	text-align: center;
+	text-decoration:none;
+	margin:25px 0 0 42px;
+	color:#42413C;
+}
+.bg-icon3 a:hover {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/3.png) no-repeat;
+}
+.bg-icon3-active a {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/3.jpg) no-repeat;
+}
+.bg-icon4 a {
+	float:left;
+	width:68px;
+	height:68px;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/04.png) no-repeat;
+	line-height: 160px;
+	text-align: center;
+	text-decoration:none;
+	margin:25px 0 0 42px;
+	color:#42413C;
+}
+.bg-icon4 a:hover {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/4.png) no-repeat;
+}
+.bg-icon4-active a {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/4.jpg) no-repeat;
+}
+.bg-icon5 a {
+	float:left;
+	width:68px;
+	height:68px;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/Tags.png) no-repeat;
+	line-height: 160px;
+	text-align: center;
+	text-decoration:none;
+	margin:25px 0 0 42px;
+	color:#42413C;
+}
+.bg-icon5 a:hover {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/Tagshover.png) no-repeat;
+}
+.bg-icon5-active a {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/Tagshover.png) no-repeat;
+}
+.bg-icon6 a {
+	float:left;
+	width:68px;
+	height:68px;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/tips.png) no-repeat;
+	line-height: 160px;
+	text-align: center;
+	text-decoration:none;
+	margin:25px 0 0 42px;
+	color:#42413C;
+}
+.bg-icon6 a:hover {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/tipsHover.png) no-repeat;
+}
+.bg-icon6-active a {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/tipsHover.png) no-repeat;
+}
+.sidebar2 {
+	float: left;
+	width:245px;
+	margin-top: -7px;
+	margin-left:5px;
+}
+.sidebar-photo {
+	float: left;
+	width:250px;
+	padding-bottom: 10px;
+	padding:5px;
+	margin-right:5px;
+	border: 1px solid #CCCCCC;
+	margin-top: 11px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+.content {
+	float: left;
+	margin-left: 8px;
+	padding: 10px 0;
+	width: 562px;
+}
+.fild2 {
+	float:left;
+	width:551px;
+	height:30px;
+	border: 1px solid #ccc;
+	padding:5px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	color:#939393;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:18px;
+	font-weight:bold;
+}
+.contaner-small-icon {
+	float:left;
+	margin-left:10px;
+	width:550px;
+	margin-top:5px;
+}
+.small-icon {
+	position: absolute;
+	top: 45px;
+	left: 835px;
+}
+.butt1 {
+	position: relative;
+	top: 0px;
+	left: 55px;
+	width:102px;
+	height:25px;
+	border: 1px solid #ccc;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/bg-butt.jpg) repeat-x;
+	float:right;
+	color:#666666;
+	font-weight:bold;
+	font-size:12px;
+
+}
+.butt1:hover {
+	width:102px;
+	height:25px;
+	border: 1px solid #ccc;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/bg-butt.jpg) repeat-x;
+	float:right;
+	color:#888;
+	font-weight:bold;
+	font-size:12px;
+	cursor: pointer;
+}
+.butt01 {
+	height:25px;
+	border: 1px solid #ccc;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/btn00.png) repeat-x;
+	float:right;
+	color:#000;
+	font-size:11px;
+	padding:0 7px;
+}
+.butt01:hover {
+	color:#666666;
+}
+.cntaner-butt1 {
+	width:561px;
+	float:left;
+}
+.butt2 {
+	width:100px;
+	height:25px;
+	border: 1px solid #ccc;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/bg-butt.jpg) repeat-x;
+	float:right;
+	color:#666666;
+	margin:5px;
+	font-weight:bold;
+	font-size:13px;
+	cursor: pointer;
+}
+.butt2:hover {
+	opacity: 0.7;
+}
+/*.butt3{
+	width:120px;
+	height:25px;
+	border: 1px solid #ccc;
+	-webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/bg-butt.jpg) repeat-x;
+	float:right;
+	color:#666666;
+	margin-left:5px;
+	font-weight:bold;
+	font-size:12px;
+	}*/
+.butt3 {
+	width:120px;
+	height:25px;
+	border: 1px solid #ccc;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/bg-butt.jpg) repeat-x;
+	float:right;
+	color:#666666;
+	margin-left:5px;
+	font-size:11px;
+}
+.butt3:hover {
+	color:#999;
+}
+.butt003 {
+	width:160px;
+	height:35px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	box-shadow: 0 0 4px #999999;
+	background: #FFF;
+	float:right;
+	color:#666666;
+	margin-left:391px;
+	font-weight:bold;
+	font-size:12px;
+	border:0;
+	cursor:pointer;
+}
+.butt003:hover {
+	color:#999;
+}
+.container-butt2 {
+	width:auto;
+	float:right;
+}
+.container-butt3 {
+	width:auto;
+	float:left;
+}
+.border-top {
+	border-top: 1px solid #ededed;
+	float: left;
+	height: 10px;
+	margin-left: 0;
+	width:560px;
+}
+
+.contaner-post {
+	float:left;
+	margin-left:5px;
+	color: black;
+	//width:454px;
+	font-size: 20px;
+	height:auto;
+	display:table;
+	//border:1px solid #d8d8d8;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	padding:10px;
+}
+.contaner-post a {
+	font-size: 25px;
+}
+.contaner-post2 {
+	float:left;
+	margin-left:5px;
+	width:524px;
+	height:auto;
+	display:table;
+	padding:4px;
+	border:1px solid #d8d8d8;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+.content-post {
+	float:left;
+	color: black;
+	display: inline-table;
+	width:500px;
+	font-size: 20px;
+	height:auto;
+	//border:1px solid #d8d8d8;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	overflow-x: auto;
+}
+.content-post a {
+	font-size: 20px;
+}
+.contaner-comment {
+	float:left;
+	margin:0 70px 5px 0;
+	color: black;
+	width:495px;
+	font-size: 15px;
+	height:auto;
+	display:table;
+	border:1px solid #d8d8d8;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	padding:10px;
+}
+.contaner-comment a {
+	font-size: 20px;
+}
+.pic1 a { font-size:13px; }
+.pic1 {
+	float:right;
+	font-size:10px;
+	//width:400px;
+	//height:50px;
+	vertical-align: bottom;
+	margin:0;
+	margin-bottom:5px;
+}
+.color-green {
+	color:#1a661b !important;
+}
+.color-gray {
+	color: #727272;
+}
+.color-gray2 {
+	color: #727272;
+	margin-left:15px;
+	font-size:11px;
+}
+.pic2 {
+	float:left;
+	width:496px;
+	height:auto;
+	border:1px solid #AAA;
+}
+.list1 ul {
+	float:left;
+	width:auto;
+	display:table;
+	height:auto;
+	margin-top:5px;
+}
+.list1 li {
+	float:left;
+	width:auto;
+	margin-right:10px;
+	display:table;
+}
+.list1 span {
+	font-size:14px;
+	color:#333;
+	font-weight:bold;
+}
+.list1 h4 {
+	font-size:14px;
+	color:#60B600;
+	font-weight:bold;
+	line-height: 18px;
+}
+.icon-butt1 {
+	width:71px;
+	height:26px;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/icon-butt_02.jpg) no-repeat;
+	float:right;
+	color:#666666;
+	margin-left:5px;
+	font-weight:normal;
+	font-size:13px;
+	border:none;
+	padding-left:16px;
+}
+.icon-butt1:hover {
+	width:71px;
+	height:26px;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/icon-butt_02.jpg) no-repeat;
+	float:right;
+	color:#999;
+	margin-left:5px;
+	font-weight:normal;
+	font-size:13px;
+	border:none;
+	padding-left:16px;
+}
+.icon-butt2 {
+	width:71px;
+	height:26px;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/icon-butt_04.jpg) no-repeat;
+	float:right;
+	color:#666666;
+	margin-left:5px;
+	font-weight:normal;
+	font-size:13px;
+	border:none;
+	padding-left:16px;
+}
+.icon-butt2:hover {
+	width:71px;
+	height:26px;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/icon-butt_04.jpg) no-repeat;
+	float:right;
+	color:#999;
+	margin-left:5px;
+	font-weight:normal;
+	font-size:13px;
+	border:none;
+	padding-left:16px;
+}
+.icon-butt3 {
+	width:71px;
+	height:26px;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/icon-butt_06.jpg) no-repeat;
+	float:right;
+	color:#666666;
+	margin-left:5px;
+	font-weight:normal;
+	font-size:13px;
+	border:none;
+	padding-left:16px;
+}
+.icon-butt3:hover {
+	width:71px;
+	height:26px;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/icon-butt_06.jpg) no-repeat;
+	float:right;
+	color:#999;
+	margin-left:5px;
+	font-weight:normal;
+	font-size:13px;
+	border:none;
+	padding-left:16px;
+}
+.titel {
+	width:250px;
+	float:left;
+	display:table;
+	height:auto;
+}
+.titel h2 {
+	color:#727272;
+}
+.tite2 {
+	width:auto;
+	float:left;
+	display:table;
+	height:auto;
+}
+.tite2 h2 {
+	color:#727272;
+}
+.tite2 p {
+	color:#b0b0b0;
+	font-size:11px;
+	float:left;
+}
+.tite02 {
+	width:auto;
+	float:left;
+	height:auto;
+}
+.tite02 h2 {
+	color:#727272;
+	float:left;
+	font-size:24px;
+}
+.tite02 p {
+	color:#b0b0b0;
+	font-size:11px;
+	float:left;
+	margin: 16px 0 0 11px;
+}
+.title0 {
+	margin:20px 0 0 0;
+	padding:0
+}
+.title0 h3 {
+	color:#45d325;
+	float:left;
+	font-size:18px;
+	font-weight:normal;
+}
+.btns {
+	background-image:transparent;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/btnGrw.jpg) no-repeat;
+	font-size:11px;
+	font-weight:bold;
+	color:#676767;
+	border:0;
+	width:34px;
+	height:29px;
+	cursor:pointer;
+	float:left;
+	margin:0 0 0 0px;
+	padding: 0 0 3px 0px;
+}
+.btns:hover, .btns2:hover, .Cbtns:hover, .Cbtns2:hover { opacity:0.7; }
+.btns2 {
+	background-image:transparent;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/btnChp.jpg) no-repeat;
+	font-size:11px;
+	font-weight:bold;
+	color:#676767;
+	border:0;
+	width:35px;
+	height:29px;
+	cursor:pointer;
+	float:left;
+	margin:0 15px 0 5px;
+	padding: 0 0 3px 10px;
+}
+.Cbtns {
+	background-image:transparent;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/btnGrw.jpg) no-repeat;
+	background-size: cover;
+	border:0;
+	width:22px;
+	height:20px;
+	cursor:pointer;
+	float:left;
+	margin:0 0 0 0px;
+	padding: 0 0 2px 0px;
+}
+.Cbtns2 {
+	background-image:transparent;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/btnChp.jpg) no-repeat;
+	background-size: cover;
+	border:0;
+	width:22px;
+	height:20px;
+	cursor:pointer;
+	float:left;
+	margin:0 0 0 0px;
+	padding: 0 0 2px 0px;
+}
+.btns_tips {
+	background-image:transparent;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/btn001.jpg) no-repeat;
+	font-size:11px;
+	font-weight:bold;
+	color:#676767;
+	border:0;
+	width:65px;
+	height:29px;
+	cursor:pointer;
+	float:right;
+	margin:0 0 0 10px;
+	padding: 0 0 3px 15px;
+}
+.btns2_tips {
+	background-image:transparent;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/btn002.jpg) no-repeat;
+	font-size:11px;
+	font-weight:bold;
+	color:#676767;
+	border:0;
+	width:65px;
+	height:29px;
+	cursor:pointer;
+	float:right;
+	margin:0 0 0 10px;
+	padding: 0 0 3px 15px;
+}
+.btns3 {
+	background-image:transparent;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/btn03.jpg) no-repeat;
+	font-size:11px;
+	font-weight:bold;
+	color:#676767;
+	border:0;
+	width:93px;
+	height:29px;
+	cursor:pointer;
+	float:right;
+	margin:0 0 0 10px;
+	padding: 0 0 3px 10px;
+}
+.btns4 {
+	background-image:transparent;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/btn04.png) no-repeat;
+	font-size:11px;
+	font-weight:bold;
+	color:#676767;
+	border:0;
+	width:93px;
+	height:29px;
+	cursor:pointer;
+	float:right;
+	padding: 0 0 3px 10px;
+}
+.btns04 {
+	background-image:transparent;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/btn004.png) no-repeat;
+	font-size:11px;
+	font-weight:bold;
+	color:#676767;
+	border:0;
+	width:93px;
+	height:29px;
+	cursor:pointer;
+	float:right;
+	padding: 0 0 3px 10px;
+}
+.btns04:hover {
+	color:#999;
+}
+.btns4:hover {
+	color:#999;
+}
+.btns:hover {
+	color:#999;
+}
+.btns2:hover {
+	color:#999;
+}
+.btns3:hover {
+	color:#999;
+}
+.userpic {
+	margin:0;
+	padding:0;
+	float:left;
+}
+.username {
+	float:left;
+	margin:0 0 0 10px;
+	font-weight:normal;
+	font-size:16px;
+	color:#000;
+}
+.titel-line {
+	width:250px;
+	float:left;
+	display:table;
+	height:5px;
+	border-top:1px solid #EDEDED;
+}
+.list2 ul {
+	float:left;
+	width:auto;
+	display:table;
+	height:auto;
+	margin-top:5px;
+}
+.list2 li {
+	float:left;
+	width:auto;
+	margin-right:2px;
+	display:table;
+}
+.list4 ul {
+	float:left;
+	width:auto;
+	display:table;
+	height:auto;
+	margin-top:5px;
+}
+.list4 li {
+	float:left;
+	width:auto;
+	margin-right:13px;
+	margin-top:5px;
+	display:table;
+}
+.list3 ul {
+	float:left;
+	width:auto;
+	display:table;
+	height:auto;
+	margin-top:5px;
+}
+.list3 li {
+	/*float:left;*/
+	width:auto;
+	margin-right:10px;
+	display:table;
+	margin-top: 10px;
+}
+.list3 {
+width: 350px;
+border: 2px;
+border-color: #DDDD00;
+
+}
+.tipbar_inner {
+//margin-top:-55px;
+//margin-left:480px;
+width: 475px;
+height: 65px;
+//border: 2px solid #ac9944;
+//border-top:0;
+background-color: rgb(204,228,202);
+}
+.tipbar {
+float:right;
+width: 475px;
+height: 65px;
+border: 2px solid #ac9944;
+border-top:0;
+background-color: rgb(204,228,202);
+}
+.Top-Awards {
+	width:58px;
+	height:42px;
+	float:left;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/Top-Awards.jpg) no-repeat;
+}
+.Top-Awards span {
+	color: #FFFFFF;
+	font-size: 18px;
+	font-weight: bold;
+	height: 15px;
+	line-height: 37px;
+	padding: 0 0 0 20px;
+	margin-right:5px;
+}
+.text-awards {
+	float: left;
+	height: auto;
+	margin-left: 2px;
+	width: 180px;
+}
+/* ~~ The footer ~~ */
+.footer {
+	background-color:rgb(0,199,77);
+	height:50px;
+	//width:100%;
+	margin: auto;
+	clear:both;
+}
+.name {
+	float: right;
+	  margin: 40px 0 0 47px;
+	width: 144px;
+}
+.name2 {
+	float: left;
+	  margin: 25px 0 0 47px;
+	width: 150px;
+	//margin-right:118px;
+}
+.linke-home {
+	float:right;
+	height:36px;
+	margin-top:39px;
+	width: 76px;
+}
+.contant-all {
+	display: table;
+	background-color: rgb(215,238,218);
+	float:left;
+	height:auto;
+	width: 710px;
+	
+}
+.contant-top {
+	display: table;
+	float:left;
+	height:auto;
+	margin: 5px 0 0 5px;
+	width: 822px;
+	padding:5px;
+}
+.contant-top01 {
+	display: table;
+	float:left;
+	height:auto;
+	margin: 5px 0 0 0;
+	width: 548px;
+	padding:5px;
+}
+.pic3 {
+	float:left;
+	width:819px;
+	height:auto;
+	border: 1px solid #AAAAAA;
+}
+.pic03 {
+	float:left;
+	width:548px;
+	height:auto;
+	border: 1px solid #AAAAAA;
+}
+.titel-grry {
+	float:left;
+	height:37px;
+	width: 811px;
+	background:#D9D9D9;
+	margin-top:5px;
+	padding:5px;
+}
+.titel-grry h2 {
+	color:#818181;
+}
+.titel-grry01 {
+	float:left;
+	height:37px;
+	width: 550px;
+	background:#D9D9D9;
+	margin-top:5px;/*padding:5px;*/
+	}
+.titel-grry01 h2 {
+	color:#818181;
+}
+.top-page {
+	margin:0;
+	padding:0;
+}
+.top-page li {
+	float:left;
+	margin-right:5px
+}
+.top-page h4 {
+	font-weight:normal;
+	color:#000;
+}
+.styled-select select {
+	background: none repeat scroll 0 0 transparent;
+	border: 0 none;
+	border-radius: 0 0 0 0;
+	color: #4B4B4B;
+	font-size: 12px;
+	height: 26px;
+	line-height: 1;
+	padding: 5px;
+	width: 166px;
+}
+.styled-select {
+	width: 144px;
+	height: 26px;
+	overflow: hidden;
+	background: url(http://web.archive.org/web/20130617181936/http://www.yougee.me/Images/select-bg.jpg) no-repeat right;
+	margin: 1px 0;
+}
+.container-compost {
+	float:left;
+	width:540px;
+	margin-top:15px;
+	padding:5px;
+	display:table;
+	border-bottom:1px solid #ccc;
+}
+.pic4 {
+	float:left;
+	width:157px;
+	height:105px;
+	background:#000;
+	border:1px solid #AAA;
+	margin-right:9px;
+}
+.list5 ul {
+	float:left;
+	width:auto;
+	display:table;
+	margin-left:5px;
+	list-style:none;
+}
+.list5 li {
+	float:left;
+	width:auto;
+	display:table;
+	list-style:none;
+	margin-left:5px;
+	padding-top: 2px;
+}
+.list5 p {
+	width:360px;
+}
+.list5 span {
+	width:auto;
+	margin-right:5px;
+	float:right;
+	color:#727272;
+}
+.list6 ul {
+	list-style:none;
+	float:left;
+}
+.list6 li {
+	float: left;
+	height: 128px;
+	list-style: none outside none;
+	margin-right: 2px;
+	margin-top: 5px;
+	width: 180px;
+	margin-left:2px;
+}
+.icon {
+	float:left;
+	width:36px;
+	height:36px;
+	margin-right:10px;
+}
+.top-titel-profile {
+	float:left;
+	font-size:20px;
+	color:#88b33f;
+}
+.top-titel-profile2 {
+	font-size:16px;
+	color:#88b33f;
+}
+.Name-profile {
+	font-size:20px;
+	color:#717171;
+	margin-top:5px;
+	text-align:center;
+	font-weight:bold;
+}
+.tips-title {
+	color:#727272;
+	padding:0;
+	float:left;
+}
+.user-name {
+	float:right;
+	text-decoration:none !important;
+	font-size:16px
+}
+.user-name img {
+	vertical-align:top;
+	margin-right:5px
+}
+/*login*/
+
+.login-r { /*background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/login-r.jpg) no-repeat right;*/
+	height: 26px;
+	padding: 6px 0 0 25px;
+}
+.login-r ul li .menu_class, .login-r ul li span, .login-r ul li .menu_class_a {
+	font:bold 13px Arial;
+	color:#505050;
+}
+.login-r ul li .menu_class, .login-r ul li .menu_class_a {
+	padding:0 8px;
+}
+ul.menu_a {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/icon-1.png) left no-repeat;
+	height:27px;
+	float:right;
+	padding:0 0 0 25px;
+	margin:5px 25px 0 0;
+}
+ul.menu_a li, .login-r ul li, ul.menu li, ul.social li, ul.banners li, ul.bottom_menu li, ul.visa li, ul.social, ul.bottom_menu, .product-details ul li, ul.fabrics li, ul.pagger li, ul.social-small li {
+	float:left;
+}
+ul.menu_a li a {
+	display:block;
+	padding:5px;
+}
+ul.menu_a li span {
+	display:block;
+	padding:5px 0;
+}
+ul.menu_a li a, ul.menu_a li span {
+	color:#fff;
+}
+.login-c { /*background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/login-c.jpg);*/
+	width:170px;
+	float:right;
+	display: inline-block;
+ *display: inline;
+	padding: 4px 0px;
+	margin-bottom: 0;
+ *margin-left: .3em;
+	font-size: 14px;
+	color: #333333;
+	text-align: center;
+	text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+	vertical-align: middle;
+	cursor: pointer;
+	background-color: #f5f5f5;
+ *background-color: #e6e6e6;
+	background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));
+	background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
+	background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
+	background-image: linear-gradient(to bottom, #ffffff, #e6e6e6);
+	background-repeat: repeat-x;
+	border: 1px solid #bbbbbb;
+ *border: 0;
+	border-color: #e6e6e6 #e6e6e6 #bfbfbf;
+	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+	border-bottom-color: #a2a2a2;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+ filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffe6e6e6', GradientType=0);
+ filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+ *zoom: 1;
+	-webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+	-moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.login-l { /*background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/login-l.jpg) no-repeat left; */
+}
+.login-r ul li .menu_class, .login-r ul li span, .login-r ul li .menu_class_a {
+	font:bold 13px Arial;
+	color:#505050;
+}
+.login-r ul li .menu_class, .login-r ul li .menu_class_a {
+	padding:0 8px;
+}
+.the_menu_a span.arrow {
+	left:105px;
+}
+ul.menu {
+	margin:13px 0 13px;
+}
+ul.menu li a {
+	font-size:16px;
+	font-weight:bold;
+	color:#fff;
+	padding:5px 40px;
+	border-right:1px solid #3c3c3c;
+	font-family:"Times New Roman";
+}
+ul.social {
+	float:left;
+}
+ul.social li {
+	margin:0 10px 0 0;
+}
+ul.social li a {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/social.png);
+	width:44px;
+	height:44px;
+	display:block;
+}
+ul.social li a.twitter {
+	background-position:-50px 0;
+}
+ul.social li a.in {
+	background-position:94px 0;
+}
+ul.social li a.google {
+	background-position:44px 0;
+}
+ul.banners li {
+	margin:5px 0 5px 10px;
+}
+ul.banners li.no {
+	margin-left:0;
+}
+.header_bottom {
+	padding:0 0 10px 0;
+}
+ul.bottom_menu {
+	margin:10px 0 0 45px;
+}
+ul.bottom_menu li a, ul.bottom_menu li span {
+	font-family:Arial;
+	font-size:13px;
+	color:#514f50;
+}
+ul.bottom_menu li a {
+	display:block;
+	padding:5px 10px;
+}
+ul.bottom_menu li span {
+	padding:5px 0;
+	display:block;
+}
+ul.visa {
+	float:right;
+}
+ul.visa li {
+	margin:0 0 0 3px;
+}
+ul.visa li a {
+	display:block;
+	width:67px;
+	height:46px;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/visa.jpg);
+}
+ul.visa li a.visa_a {
+	background-position:-69px 0;
+}
+ul.visa li a.visa_b {
+	background-position:-139px 0;
+}
+ul.visa li a.visa_c {
+	background-position:-208px 0;
+}
+p.rights {
+	font-family:Arial;
+	font-size:12px;
+	color:#959595;
+	float:left;
+	padding:20px 0 0 0;
+}
+p.rights a {
+	color:#77aa28;
+}
+.mailing-c {
+	width:535px;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/footer-c.jpg);
+	float:right;
+}
+.mailing-r {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/footer-r.jpg) right no-repeat;
+}
+.mailing-l {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/footer-l.jpg) left no-repeat;
+	height:35px;
+	padding:5px 10px 0 10px;
+}
+.mailing-l label {
+	font-family:Arial;
+	font-size:14px;
+	font-weight:bold;
+	color:#fff;
+}
+.mailing-l input[type="text"] {
+	background:#585858;
+	border-radius:25px;
+	border:none;
+	padding:5px 10px;
+	font-family:Arial;
+	font-size:12px;
+	color:#959595;
+	width:140px;
+}
+.mailing-l input[type="submit"] {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/button-1.jpg);
+	height:26px;
+	border-radius:25px;
+	border:none;
+	font-family:Arial;
+	color:#fff;
+	font-size:12px;
+	font-weight:bold;
+	padding:0 15px;
+}
+.mailing-l label, .mailing-l input[type="text"], .mailing-l input[type="submit"] {
+	margin:0 3px;
+	box-shadow:none;
+}
+.layout {
+	padding:8px 0;
+}
+.container-cart {
+	margin:10px 0 0 0;
+}
+/*********************** Sliding ****************************************/
+
+.menu_class, .menu_class_a {
+	cursor:pointer;
+}
+.the_menu, .the_menu_a {
+	display:none;
+	position:fixed;
+	z-index:100;
+	right:-50px;
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/login-bg.jpg);
+	top:100px;
+	margin:0 125px 0 0;
+}
+.form_left {
+	float:left;
+	width:200px;
+	padding:0 15px;
+}
+.form_right {
+	width:200px;
+	padding:0 15px;
+}
+.form_right a{
+	color: #0000FF;
+}
+.the_menu label, .the_menu_a label {
+	font-weight:bold;
+	font-size:12px;
+	color:#464646;
+	display:block;
+	padding:5px 0;
+	text-align:left;
+}
+.the_menu input[type="text"], .the_menu input[type="password"], .the_menu_a input[type="text"], .the_menu_a input[type="password"] {
+	border:1px solid #eeeeee;
+	border-radius:5px;
+	padding:5px;
+	width:96%;
+	font-size:12px;
+	color:#202020;
+}
+input[type="text"], input[type="password"], select {
+	height: 25px;
+	width: 100%;
+	border-radius: 5px;
+	background: #F5F5F5;
+/*filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f1f1f1', endColorstr='#FFFFFF');
+	background: -webkit-gradient(linear, left top, left bottom, from(#f1f1f1), to(#FFFFFF));
+	background: -moz-linear-gradient(top, #f1f1f1, #FFFFFF);
+	-webkit-box-shadow: inset 0px 1px 1px #9A9A9A;
+	-moz-box-shadow: inset 0px 1px 1px #9A9A9A;
+	-o-box-shadow: inset 0px 1px 1px #9A9A9A;
+	-khtml-box-shadow: inset 0px 1px 1px #9A9A9A;
+	box-shadow: inset 0px 1px 1px #9A9A9A;*/
+	font-size:12px;
+	color:#202020;
+}
+select {
+	border:1px solid #8A8A8A;
+	border-radius:5px 5px 5px 5px;
+	margin:0 5px;
+	padding:0 2px;
+	width:72px;
+}
+.the_menu select {
+	border:1px solid #eeeeee;
+	border-radius:5px;
+	padding:5px;
+}
+.form_right label.new {
+	padding:25px 0 0 0;
+}
+.form_right input[type="submit"], .forms_a input[type="submit"] {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/signup.png);
+	width:190px;
+	height:80px;
+	border:none;
+	border-radius:10px;
+	margin:10px 75px 0 auto;
+	font-size:16px;
+	color:#fff;
+	cursor: pointer;
+	font-weight:bold;
+	font-family:Arial;
+}
+
+
+.the_menu h1, .forms_a h1 {
+	position:absolute;
+	z-index:150;
+	background:#fff;
+	top:0;
+	left:0;
+	width:100%;
+	height:40px;
+	color:#508103;
+	text-indent:20px;
+	line-height:38px;
+}
+.forms_a h1 {
+	background:none;
+	top:5px;
+}
+.forms, .forms_a {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/login-bg.jpg);
+	padding:30px 20px 20px 10px;
+	display:inline-block;
+	width:200px;
+}
+.forms_a {
+	width:200px;
+	padding:30px 20px 20px;
+}
+.form_left p {
+	padding:15px 0 0 0;
+}
+.form_left a {
+	color:#508103;
+}
+span.arrow {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/arrow.png) no-repeat;
+	width:34px;
+	height:13px;
+	position:relative;
+	top:-13px;
+	left:320px;
+	display:block;
+}
+a.facebook_new, a.twitter_new {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/face.png);
+	display:block;
+	width:208px;
+	height:33px;
+	margin:0 auto 10px auto;
+}
+a.twitter_new {
+	background-position:0 32px;
+}
+.about {
+	width:650px;
+}
+.about_new h2 {
+	color:#819b58;
+}
+.about p {
+	margin:10px 0;
+	width:auto;
+}
+a.forgot {
+	color:#487402;
+	margin:10px 0 0 0;
+	display:block;
+}
+/***************************** Slider ***************************************/
+.register {
+	border: 1px solid #E54D76;
+	border-radius: 5px 5px 5px 5px;
+	margin-right: 30px;
+	padding: 20px 10px;
+}
+.register-box {
+	border: 1px solid #CCCCCC;
+	border-radius: 6px 6px 6px 6px;
+	color: #444444;
+	height: 34px;
+	margin-bottom: 10px;
+	padding: 0 9px;
+	width: 303px;
+}
+.register-btn {
+	background: url("/web/20130617181936/http://www.yougee.me/images/euroboat_09.jpg") repeat scroll 0 0 transparent;
+	border: 0 none;
+	border-radius: 5px 5px 5px 5px;
+	color: #FFFFFF;
+	float: right;
+	font-weight: bold;
+	height: 23px;
+	line-height: 21px;
+	margin-right:164px;
+	margin-bottom:20px;
+	text-align: center;
+	width: 86px;
+	cursor: pointer;
+}
+.ulList {
+	margin:0;
+	padding:0;
+	list-style:none;
+}
+#menufooter {
+	width:755px;
+	margin:0 auto;
+	text-align:center;
+}
+.menuFooter {
+	display:inline-block; /*margin-right:5px;*/
+	margin-bottom:5px;
+	border-right:1px #B0B0B0 solid;
+}
+.menuFooter a {
+	display:inline-block;
+	padding:0 5px;
+	color:#fff;
+	text-decoration:none;
+	font-size:12px;
+}
+.menuFooter a:hover {
+	text-decoration:underline;
+}
+.buttadd {
+	background: url("/web/20130617181936/http://www.yougee.me/images/bg-butt.jpg") repeat-x scroll 0 0 transparent;
+	border: 1px solid #CCCCCC;
+	border-radius: 5px 5px 5px 5px;
+	color: #666666;
+	float: right;
+	font-size: 12px;
+	font-weight: bold;
+	height: 25px;
+	margin-right: 10px;
+	margin-top: -101px;
+	top: -60px;
+	width: 148px;
+}
+/*****************************************/
+.listmembers {
+	float: left;
+	font: large;
+	margin: 10px 0 0 12px;
+	padding:10px;
+	width: 543px;
+}
+.listmembers li {
+	border:1px solid #CCC;
+	margin-bottom:10px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+.user_list_link {
+	margin-right:5px;
+}
+.setting-right {
+	float:left;
+	margin:-511px 0 0 188px;
+	width:550px;
+}
+.setting-right h2 {
+	color:#64645a;
+}
+.setting-right h4 {
+	color:#64645a;
+	font-weight:normal;
+}
+.setting-right h5 {
+	color:#64645a;
+	font-weight:normal;
+	float:right;
+	margin-right:5px;
+	margin-top:5px;
+}
+.input-1 {
+	background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/input-bg.png) repeat-x;
+	width:390px;
+	height:24px;
+	border:1px solid #c2c2c2;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	padding:0 5px;
+}
+td {
+	vertical-align:top;
+}
+.setting-btns {
+	margin:0 0 10px 361px;
+	padding:0;
+	display:table;
+}
+.setting-btns li {
+	float:left;
+	margin-right:25px;
+}
+.del-image
+{
+	position: relative;
+	float: right;
+	cursor: pointer;
+}
+.list_color
+{
+	color:#009900
+}
+.all_badges_tr
+{
+	margin-left: 19px; margin-top: -38px;
+	color:#FFFFFF ;
+}
+.all_badges_text
+{
+	padding-top:15px;
+}
+.like_comment
+{
+ 	color: #0C3;
+    cursor: pointer;
+    text-decoration: none;
+}
+.UFICommentActions {
+    clear: both;
+    padding-top: 2px;
+}
+.comment_count
+{
+
+    color: #0C3;
+    cursor: pointer;
+
+}
+/*************************************  about us  ***************************/
+.about-us{padding:10px; margin:0;}
+.about-us h2{
+	color:#727272;
+    font-size:24px;
+    padding:0;
+}
+
+
+/******************************************  table page   **********************************/
+.table-page{ margin:10px auto; padding:10px; width:1105px; background-color:#dddddd;}
+.top-table{
+   background: #bfd255; /* Old browsers */
+background: -moz-linear-gradient(top,  #bfd255 0%, #8eb92a 50%, #72aa00 51%, #9ecb2d 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#bfd255), color-stop(50%,#8eb92a), color-stop(51%,#72aa00), color-stop(100%,#9ecb2d)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top,  #bfd255 0%,#8eb92a 50%,#72aa00 51%,#9ecb2d 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top,  #bfd255 0%,#8eb92a 50%,#72aa00 51%,#9ecb2d 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top,  #bfd255 0%,#8eb92a 50%,#72aa00 51%,#9ecb2d 100%); /* IE10+ */
+background: linear-gradient(to bottom,  #bfd255 0%,#8eb92a 50%,#72aa00 51%,#9ecb2d 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#bfd255', endColorstr='#9ecb2d',GradientType=0 ); /* IE6-9 */ color:#FFF; font-weight:bold; font-size:12px;
+    }
+.tdColor{ background-color:#fff; font-size:11px; color:#333;}
+.Badges{ margin:0; padding:0;}
+.Badges li{ float:left; margin:4px;}
+.Badge-icon1{ background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/green.jpg) no-repeat ; width:64px; height:43px; text-align:center; color:#FFF; padding-top:16px; font-size:11px; line-height:100%;}
+.Badge-icon2{ background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/brown.jpg) no-repeat ; width:64px; height:43px; text-align:center; color:#FFF; padding-top:16px; font-size:11px; line-height:100%;}
+.Badge-icon3{ background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/blue-Copy.jpg) no-repeat ; width:64px; height:43px; text-align:center; color:#FFF; padding-top:16px; font-size:11px; line-height:100%;}
+.Badge-icon4{ background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/blue.jpg) no-repeat ; width:64px; height:43px; text-align:center; color:#FFF; padding-top:16px; font-size:11px; line-height:100%;}
+.Badge-icon5{ background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/green-Copy.jpg) no-repeat ; width:64px; height:43px; text-align:center; color:#FFF; padding-top:16px; font-size:11px; line-height:100%;}
+.Badge-icon6{ background:url(http://web.archive.org/web/20130617181936/http://www.yougee.me/images/black.jpg) no-repeat ; width:64px; height:43px; text-align:center; color:#FFF; padding-top:16px; font-size:11px; line-height:100%;}
+.overlay-img { position:relative; display:inline-block;}
+.overlay-img:before {
+	content: ' ';
+	display: block;
+	position:absolute;
+	width:100%;
+	height:100%;
+	background: rgba(  	139,134,130, 0.3); /* rgb Color with alpha, you can also give it a bg color and set opacity: down. */
+	pointer-events: none;
+}
+
+.headerbtn{
+border: 1px solid #BBC399;
+border-top:0;
+background-color: rgb(216,239,200);
+padding-left:1px;
+width:235px;
+height:66px;
+}
+.headerbtn:hover{
+opacity:0.7;
+}
+.headerbtn:active{
+background-color: rgb(266,189,150);
+opacity:0.4;
+}
+
+/******************************************  table page   **********************************/
+.editor{
+width: 800px;
+border: 1px solid #bbc399;
+border-radius: 10px;
+background-color:rgb(215,238,218);
+padding: 5px;
+font-size: 12px;
+}
+.tiptext{
+position: absolute;
+top: 14px;
+left: 52px;
+width: 400px;
+height: 53px;
+border: 0;
+color: #000000;
+background-color:rgb(204,228,202);
+font-size: 12px;
+overflow: auto;
+}
+.tipeditor{
+position:absolute;
+top:0;
+left:0;
+width:417px;
+height:64px;
+background-color:rgb(215,238,218);
+resize: none;
+}

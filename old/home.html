@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<base href="http://astro.temple.edu/~tue56449/">
+	<meta name="author" content="Gonen Shoham" />
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<link rel="stylesheet" href="images/style.css" type="text/css" />
+    <link rel="shortcut icon" href="images/GLogo.ico" type="image/vnd.microsoft.icon" />
+	<title>Gonen Shoham - Web, Software, and Mobile Development</title>
+    <base target="_blank" />
+	<script>
+	documenthead = parent.document.head;// || parent.document.getElementsByTagName('head')[0];
+	function changeFavicon(src) {
+	var link = document.createElement('link'),
+     oldLink = document.getElementById('dynamic-favicon');
+	link.id = 'dynamic-favicon';
+	link.rel = 'shortcut icon';
+	link.href = src;
+	if (oldLink) {
+	documenthead.removeChild(oldLink);
+	}
+	documenthead.appendChild(link);
+	}
+	
+	function ShowDiv(divid){
+	document.getElementById("divabout").style.opacity=0;
+	switch(divid){
+	case 'divabout':
+		document.getElementById("divabout").innerHTML="<u>About me:</u><br>I was born in Kibbutz Netzer Sereni, Israel in December 1987. I was raised in an agricultural community and was practically born into engineering and invention out of necessity.<br>My upbringing equipped me with strong and versatile problem-solving skills which I use and implement into every aspect of my life.<br />In June 2012 I came to the US to pursue my dream of becoming an Automotive Engineer.";
+		break;
+	case 'divserv':
+		document.getElementById("divabout").innerHTML="<u>Services:</u><br><li><b>Web Development</b> - HTML5, ASP.NET, PHP, JS</li><li><b>Mobile Development</b> - Web Oriented, Dynamic Apps</li><li><b>Desktop Development</b> - VB.NET, C++, C#, Python, Scripting, Data Analysis and Conversion, System Manipulation, Remote Control</li><li><b>Mechanical Engineering</b> - CAD, CAM, Solids and Fluids, Electrical</li>";
+		break;
+		}
+	document.getElementById("divabout").style.opacity=1;
+	}
+	</script>
+    <style type="text/css">
+        .auto-style1 {
+            font-size: x-large;
+        }
+        .auto-style2 {
+            font-size: large;
+        }
+        .auto-style3 {
+            font-family: Tahoma, sans-serif;
+            font-size: 36px;
+            color: #CC0000;
+            font-weight: bold;
+            padding: 10px;
+        }
+		#divabout{
+		position:absolute;
+		opacity:0;
+		background:rgba(220,220,220,0.9);
+		padding:20px;
+		top:200px;
+		left:25%;
+		width:50%;
+		font-family: Tahoma, sans-serif;
+        font-size: 16px;
+		text-align:left;
+		border:solid 1px #888;
+		border-radius:10px;
+		-moz-transition:all ease 0.5s;
+		-webkit-transition:all ease 0.5s;
+		-o-transition:all ease 0.5s;
+		transition:all ease 0.5s;
+		}
+    </style>
+</head>
+<body onLoad="changeFavicon('images/GLogo.ico');">
+	<div id="page" align="center">
+		<div id="content" style="width:800px">
+			<div id="logo"><br />
+				<div style="margin-top:00px" class="whitetitle">&nbsp;&nbsp; <span class="auto-style1">Gonen Shoham<br />
+                    <br />
+                    </span><span class="auto-style2">Web, Desktop,
+                    <br />
+                    and
+                    Mobile<br />
+&nbsp;&nbsp;&nbsp;&nbsp; Development</span></div>
+			</div>
+			<div id="topheader">
+				<div align="left" class="bodytext">
+					<br />
+					<li>Web Development</li>
+					<li>Desktop Development</li>
+                    <li>Mobile Development</li>
+                    <li>Mechanical Engineering</li>
+				</div>
+                <div id="toplogos" class="smallgraytext" ><img src="images/Windows.gif" width="50" height="50"/><img src="images/NET.gif" width="50" height="50"/><img src="images/Android.gif" width="50" height="50"/><img src="images/ubuntutux.png" width="50" height="50"/><img src="images/Chrome.gif" width="50" height="50"/></div>
+				<div id="toplinks" class="smallgraytext">
+					<a href="http://astro.temple.edu/~tue56449/index.html">Home</a> | <a href="mailto:gonensh@gmail.com">Contact</a>
+				</div>
+			</div>
+			<div id="menu">
+				<div align="right" class="smallwhitetext" style="padding:9px;">
+					<a href="http://astro.temple.edu/~tue56449/index.html">Home</a> | <a style="cursor:pointer;" onclick="javascript:ShowDiv('divabout');">About</a> | <a href="http://sites.google.com/site/gonensh">Mechanical Engineering</a> | <a style="cursor:pointer;" onclick="javascript:ShowDiv('divserv');">Services</a> | <a href="mailto:gonensh@gmail.com">Contact</a>
+				</div>
+			</div>
+			<div id="submenu">
+				<div align="center" class="smallgraytext" style="padding:9px;">
+					<strong style="color:#000">Web Portfolio:</strong>&nbsp;&nbsp;
+					<a href="http://www.yougee.me">Yougee.me</a> / <a href="http://www.yougee.me/?action=a">Beta</a> | <a href="http://develop.temple.edu/rcc/Beta">The Russell Conwell Center Beta</a> / <a href="http://www.temple.edu/rcc/">Old Version</a>
+				</div>
+			</div>
+				<div id="divabout" onClick="this.style.opacity=0;"></div>
+						
+			<div id="contenttext">
+				<div class="auto-style3">
+					Gonen Shoham</div>
+					<div class="bodytext" style="padding:12px;" align="justify">
+					<strong>Hey! My name is Gonen Shoham and I am an all-around developer, working on a wide variety of platforms and languages.<br />
+                        I have been programming since I was 10 years old (in 1998) and have been teaching myself new languages ever since.<br />
+                        I code in HTML5, JavaScript, Ajax, CSS, ASP.NET, VB.NET, PHP, C++, C#, and Python.<br />
+                        My web sites, android application, and windows software are all innovative and efficient, implementing my own algorithms that are based on simplicity and efficiency.<br />
+                        I am currently a Mechanical Engineering student at Temple University, and live in Philadelphia.<br />
+                        Please contact me for any question!<br />
+                        <br />
+                        Email: <a href="mailto:gonensh@gmail.com">gonensh@gmail.com</a></strong><br />
+					<br />
+				</div>
+			</div>
+			<div id="leftpanel">
+				<div align="justify" class="graypanel">
+					<span class="smalltitle">Recent Activity</span><br /><br />
+					<span class="smallredtext">March 1, 2013</span><br />
+					<span class="bodytext">CTO and Developer - Yougee.me</span><br /><br />
+					<span class="smallredtext">January 2, 2013</span><br />
+					<span class="bodytext">Webmaster - RCC, Temple University</span><br /><br />
+					<span class="smallredtext">August 27, 2012</span><br />
+					<span class="bodytext">Student at Temple University<br />Bachelors of Science in Mechanical Engineering</span><br /><br />
+					<span class="smallredtext">June 14, 2012</span><br />
+					<span class="bodytext">Arrival at the US<br />
+                    Rock Climbing Instructor - Ramah Nyack</span><br />
+					<br />
+
+					
+				</div>
+			</div>
+            <div align="center"><img src="images/GLogo.gif" /></div>
+			<div id="footer" class="smallgraytext">
+				<a href="http://astro.temple.edu/~tue56449/index.html">Home</a> | <a style="cursor:pointer;" onclick="javascript:ShowDiv('divabout');">About</a> | <a href="http://sites.google.com/site/gonensh">Mechanical Engineering</a> | <a style="cursor:pointer;" onclick="javascript:ShowDiv('divserv');">Services</a> | <a href="mailto:gonensh@gmail.com">Contact</a>
+				| Gonen Shoham 
+				&copy; 2013 
+			</div>
+		</div>
+	</div>
+</body>
+</html>
+<comment>

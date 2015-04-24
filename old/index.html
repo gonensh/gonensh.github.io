@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<base href="http://astro.temple.edu/~tue56449/">
+	<meta name="author" content="Gonen Shoham" />
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<link rel="stylesheet" href="images/style.css" type="text/css" />
+    <link rel="shortcut icon" href="images/GLogo.ico" type="image/vnd.microsoft.icon" />
+	<title>Gonen Shoham - Web, Software, and Mobile Development</title>
+    <base target="_blank" />
+	<script>
+	function ShowDiv(divid){
+	document.getElementById("divbg").style.display="block";
+	document.getElementById("divbg").style.opacity=0.7;
+	document.getElementById("divabout").style.opacity=0;
+	switch(divid){
+	case 'divabout':
+		document.getElementById("divabout").innerHTML="<u>About me:</u><br>I was born in Kibbutz Netzer Sereni, Israel in December 1987. I was raised in an agricultural community and was practically born into engineering and invention out of necessity.<br>My upbringing equipped me with strong and versatile problem-solving skills which I use and implement into every aspect of my life.<br />In June 2012 I came to the US to pursue my dream of becoming an Automotive Engineer.";
+		break;
+	case 'divserv':
+		document.getElementById("divabout").innerHTML="<u>Services:</u><br><li><b>Web Development</b> - HTML5, ASP.NET, PHP, JS</li><li><b>Mobile Development</b> - Web Oriented, Dynamic Apps</li><li><b>Desktop Development</b> - VB.NET, C++, C#, Python, Scripting, Data Analysis and Conversion, System Manipulation, Remote Control</li><li><b>Mechanical Engineering</b> - CAD, CAM, Solids and Fluids, Electrical</li>";
+		break;
+	case 'portfolio':
+		document.getElementById("divabout").innerHTML="<u>Web Portfolio:</u><br><table width=100%><tr><td style='vertical-align: top;width: 400px;'><li><a target=ifr href=Yougee/Yougee.html><b>Yougee.me</b></a></li><li><a target=ifr href=http://www.temple.edu/rcc/Beta/><b>Temple U RCLC (Beta)</b></a></li><li><a target=ifr href=http://demo.starcitymoving.com/><b>Starcity (WIP)</b></a></li></td><td><iframe width=450 height=350 name=ifr id=ifr style='margin-bottom: -335px;height: 670px;margin-right: -510px;width: 1005px;-webkit-transform: scale(0.50);-webkit-transform-origin: 0 0;'></iframe></td></tr></table>";
+		break;
+		}
+	document.getElementById("divabout").style.opacity=1;
+	}
+	function closediv(){
+	divabout.style.opacity=0;
+	divbg.style.opacity=0;
+	setTimeout(function(){divbg.style.display='none';},800);
+	}
+	</script>
+    <style type="text/css">
+        .auto-style1 {
+            font-size: x-large;
+        }
+        .auto-style2 {
+            font-size: large;
+        }
+        .auto-style3 {
+            font-family: Tahoma, sans-serif;
+            font-size: 36px;
+            color: #CC0000;
+            font-weight: bold;
+            padding: 10px;
+        }
+		#divabout{
+		position:absolute;
+		opacity:0;
+		background:rgba(220,220,220,0.9);
+		padding:20px;
+		top:200px;
+		left:25%;
+		width:50%;
+		font-family: Tahoma, sans-serif;
+        font-size: 16px;
+		text-align:left;
+		border:solid 1px #888;
+		border-radius:10px;
+		-moz-transition:all ease 0.7s;
+		-webkit-transition:all ease 0.7s;
+		-o-transition:all ease 0.7s;
+		transition:all ease 0.7s;
+		z-index:10;
+		}
+		#divbg{
+		position:absolute;
+		top:0;
+		left:0;
+		display:none;
+		z-index:9;
+		background-color:#000;
+		opacity:0.6;
+		width:100%;
+		height:100%;
+		-moz-transition:all ease-out 1s;
+		-webkit-transition:all ease-out 1s;
+		-o-transition:all ease-out 1s;
+		transition:all ease-out 1s;
+		}
+    </style>
+</head>
+<body>
+	<div id="page" align="center">
+		<div id="content" style="width:800px">
+			<div id="logo"><br />
+				<div style="margin-top:00px" class="whitetitle">&nbsp;&nbsp; <span class="auto-style1">Gonen Shoham<br />
+                    <br />
+                    </span><span class="auto-style2">Web, Desktop,
+                    <br />
+                    and
+                    Mobile<br />
+&nbsp;&nbsp;&nbsp;&nbsp; Development</span></div>
+			</div>
+			<div id="topheader">
+				<div align="left" class="bodytext">
+					<br />
+					<li>Web Development</li>
+					<li>Desktop Development</li>
+                    <li>Mobile Development</li>
+                    <li>Mechanical Engineering</li>
+				</div>
+                <div id="toplogos" class="smallgraytext" ><img src="images/IOS7_Logo.png" width="50" height="35"/><img src="images/Microsoft_.NET_Logo.png" width="90" height="50"/><img src="images/Android.gif" width="50" height="50"/><img src="images/ubuntutux.png" width="50" height="50"/></div>
+				<div id="toplinks" class="smallgraytext">
+					<a href="http://astro.temple.edu/~tue56449/index.html">Home</a> | <a href="mailto:gonensh@gmail.com">Contact</a>
+				</div>
+			</div>
+			<div id="menu">
+				<div align="right" class="smallwhitetext" style="padding:9px;">
+					<a href="http://astro.temple.edu/~tue56449/index.html">Home</a> | <a style="cursor:pointer;" onclick="javascript:ShowDiv('divabout');">About</a> | <a href="http://sites.google.com/site/gonensh">Mechanical Engineering</a> | <a style="cursor:pointer;" onclick="javascript:ShowDiv('divserv');">Services</a> | <a href="mailto:gonensh@gmail.com">Contact</a>
+				</div>
+			</div>
+			<div id="submenu">
+				<div align="center" class="smallgraytext" style="padding:9px;">
+				<a style="cursor:pointer;" onclick="javascript:ShowDiv('portfolio');">
+				<strong style="color:#000">Web Portfolio:</strong></a>&nbsp;&nbsp;
+				<a href="http://astro.temple.edu/~tue56449/Yougee/Yougee.html">Yougee.me (Discontinued)</a>
+				 | <a href="http://www.temple.edu/rcc/Beta">Temple University RCLC Beta</a> / <a href="http://www.temple.edu/rcc/">Old Version</a>
+				 | <a href="http://demo.starcitymoving.com">Starcity</a>
+				</div>
+			</div>
+			<!------ DIVs ------>
+			<div id="divbg" onClick="closediv()"></div>
+			<div id="divabout"></div>
+			<!------ DIVs ------>
+			<div id="contenttext">
+				<div class="auto-style3">
+					Gonen Shoham</div>
+					<div class="bodytext" style="padding:12px;" align="justify">
+					<strong>I am a software developer, working on a wide variety of platforms and languages for the past <script>document.write(((new Date()).getYear()+1900-1998) || 17);</script> years.<br />
+                        I have been programming since I was 10 years old (in 1998) and have been teaching myself new languages ever since.<br />
+			<br />
+                        <U>Programming languages and tools:</U>
+						<i> C, C++, C#, Objective-C, Java, Visual Basic, VB.NET, HTML, JavaScript, jQuery, AJAX, CSS, PHP, ASP, ASP.NET, SQL, XML, Python, Ruby; Node.JS, Foundation, Bootstrap, REST, Rails, Symfony2, Git, .NET Framework, Visual Studio, Eclipse, Android Studio, XCode, IIS, Apache, VMWare, Linux, Windows, Mac OSX, iOS, Android, AVR, Atmel Studio
+						</i><br />
+			<br />
+                        My Web, Android, iOS, Linux, and Windows software are all written with innovative and efficient original algorithms that are based on simplicity and reliability.<br />
+                        I am currently studying Computer Science at Temple University, and live in Philadelphia.<br />
+                        Please contact me for any question!<br />
+                        <br />
+                        Email: <a href="mailto:gonensh@gmail.com">gonensh@gmail.com</a></strong><br />
+					<br />
+				</div>
+			</div>
+			<div id="leftpanel">
+				<div align="justify" class="graypanel">
+					<span class="smalltitle">Recent Activity</span><br /><br />
+					<span class="smallredtext">October, 2014</span><br />
+					<span class="bodytext">Web Developer - Starcity</span><br /><br />
+					<span class="smallredtext">October, 2013</span><br />
+					<span class="bodytext">Software and Hardware Developer - eThree</span><br /><br />
+					<span class="smallredtext">March, 2013</span><br />
+					<span class="bodytext">Web Developer - Yougee.me</span><br /><br />
+					<span class="smallredtext">January, 2013</span><br />
+					<span class="bodytext">Webmaster - RCC, Temple University</span><br /><br />
+					<span class="smallredtext">August, 2012</span><br />
+					<span class="bodytext">Student at Temple University<br />BSc. in Computer Science</span><br /><br />
+					<!--<span class="smallredtext">June, 2012</span><br />
+					<span class="bodytext">Rock Climbing Instructor - Ramah Nyack</span><br />-->
+					<br />
+
+					
+				</div>
+			</div>
+            <div align="center"><img src="images/GLogo.gif" /></div>
+			<div id="footer" class="smallgraytext">
+				<a href="http://astro.temple.edu/~tue56449/index.html">Home</a> | <a style="cursor:pointer;" onclick="javascript:ShowDiv('divabout');">About</a> | <a href="http://sites.google.com/site/gonensh">Mechanical Engineering</a> | <a style="cursor:pointer;" onclick="javascript:ShowDiv('divserv');">Services</a> | <a href="mailto:gonensh@gmail.com">Contact</a>
+				| Gonen Shoham 
+				&copy; 2015 
+			</div>
+		</div>
+	</div>
+</body>
+</html>
+<comment>
