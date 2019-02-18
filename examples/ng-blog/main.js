@@ -260,7 +260,7 @@ var AppModule = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<app-posts></app-posts>\n"
+module.exports = "<app-filters></app-filters>\n<div class=\"home-title\">My Works</div>\n<app-posts></app-posts>\n"
 
 /***/ }),
 
@@ -271,7 +271,7 @@ module.exports = "<app-posts></app-posts>\n"
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2hvbWUvaG9tZS5jb21wb25lbnQuc2NzcyJ9 */"
+module.exports = ".home-title {\n  font-size: 14px;\n  padding-bottom: 3em;\n  text-transform: uppercase; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9nc2hvaGFtL0RldmVsb3BtZW50L25nLWJsb2cvc3JjL2FwcC9ob21lL2hvbWUuY29tcG9uZW50LnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDRSxlQUFlO0VBQ2YsbUJBQW1CO0VBQ25CLHlCQUF5QixFQUFBIiwiZmlsZSI6InNyYy9hcHAvaG9tZS9ob21lLmNvbXBvbmVudC5zY3NzIiwic291cmNlc0NvbnRlbnQiOlsiLmhvbWUtdGl0bGUge1xuICBmb250LXNpemU6IDE0cHg7XG4gIHBhZGRpbmctYm90dG9tOiAzZW07XG4gIHRleHQtdHJhbnNmb3JtOiB1cHBlcmNhc2U7XG59XG4iXX0= */"
 
 /***/ }),
 
@@ -381,7 +381,7 @@ var JoinPipe = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<div *ngIf=\"categories\" class=\"categories-container\">\n  <a *ngFor=\"let category of categories\">{{category}}</a>\n</div>\n"
+module.exports = "<div class=\"filters-container\">\n  <div *ngIf=\"categories\" class=\"categories-container\">\n    <a *ngFor=\"let category of categories\" class=\"category-filter\">{{category}}</a>\n  </div>\n</div>\n"
 
 /***/ }),
 
@@ -392,7 +392,7 @@ module.exports = "<div *ngIf=\"categories\" class=\"categories-container\">\n  <
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL3Bvc3RzL2ZpbHRlcnMvZmlsdGVycy5jb21wb25lbnQuc2NzcyJ9 */"
+module.exports = ".category-filter {\n  border-bottom: dotted 1px #000;\n  margin: 0 1em 0 .5em;\n  text-transform: uppercase; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9nc2hvaGFtL0RldmVsb3BtZW50L25nLWJsb2cvc3JjL2FwcC9wb3N0cy9maWx0ZXJzL2ZpbHRlcnMuY29tcG9uZW50LnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBRUE7RUFDRSw4QkFIeUM7RUFJekMsb0JBQW9CO0VBQ3BCLHlCQUF5QixFQUFBIiwiZmlsZSI6InNyYy9hcHAvcG9zdHMvZmlsdGVycy9maWx0ZXJzLmNvbXBvbmVudC5zY3NzIiwic291cmNlc0NvbnRlbnQiOlsiJGNhdGVnb3J5LWZpbHRlci11bmRlcmxpbmU6IGRvdHRlZCAxcHggIzAwMDtcblxuLmNhdGVnb3J5LWZpbHRlciB7XG4gIGJvcmRlci1ib3R0b206ICRjYXRlZ29yeS1maWx0ZXItdW5kZXJsaW5lO1xuICBtYXJnaW46IDAgMWVtIDAgLjVlbTtcbiAgdGV4dC10cmFuc2Zvcm06IHVwcGVyY2FzZTtcbn1cbiJdfQ== */"
 
 /***/ }),
 
@@ -412,7 +412,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var FiltersComponent = /** @class */ (function () {
     function FiltersComponent() {
-        this.categories = ['all', 'web', 'dev', 'design'];
+        this.categories = ['All', 'Digital', 'Web', 'Print'];
     }
     FiltersComponent.prototype.ngOnInit = function () { };
     FiltersComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
@@ -437,7 +437,7 @@ var FiltersComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<div *ngIf=\"post\" class=\"post-tile\">\n  <div class=\"post-tile--image\" [style.backgroundImage]=\"'url(' + post.image + ')'\"></div>\n  <div class=\"post-tile--categories\">{{post.categories | join:', '}}</div>\n  <div class=\"post-tile--title\">{{post.title}}</div>\n  <div class=\"post-tile--content\">{{post.body | slice:0:50}}&hellip;</div>\n</div>\n"
+module.exports = "<div *ngIf=\"post\" class=\"post-tile\">\n  <div class=\"post-tile--image-container\" (click)=\"previewPost()\">\n    <img class=\"post-tile--image\" src=\"{{post.image}}\">\n    <div class=\"post-tile--image-overlay\"></div>\n  </div>\n  <div class=\"post-tile--categories\">{{post.categories | join:', '}}</div>\n  <div class=\"post-tile--title\">{{post.title | slice:0:30}}<span *ngIf=\"post.title.length > 30\">&hellip;</span></div>\n  <div class=\"post-tile--body\">{{post.body | slice:0:180}}<span *ngIf=\"post.body.length > 180\">&hellip;</span></div>\n</div>\n"
 
 /***/ }),
 
@@ -448,7 +448,7 @@ module.exports = "<div *ngIf=\"post\" class=\"post-tile\">\n  <div class=\"post-
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = ".post-tile--image {\n  background-size: cover;\n  height: 178px;\n  width: 100%; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9nc2hvaGFtL0RldmVsb3BtZW50L25nLWJsb2cvc3JjL2FwcC9wb3N0cy9wb3N0LXRpbGUvcG9zdC10aWxlLmNvbXBvbmVudC5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUNFO0VBQ0Usc0JBQXNCO0VBQ3RCLGFBQWE7RUFDYixXQUFXLEVBQUEiLCJmaWxlIjoic3JjL2FwcC9wb3N0cy9wb3N0LXRpbGUvcG9zdC10aWxlLmNvbXBvbmVudC5zY3NzIiwic291cmNlc0NvbnRlbnQiOlsiLnBvc3QtdGlsZSB7XG4gICYtLWltYWdlIHtcbiAgICBiYWNrZ3JvdW5kLXNpemU6IGNvdmVyO1xuICAgIGhlaWdodDogMTc4cHg7XG4gICAgd2lkdGg6IDEwMCU7XG4gIH1cbn1cbiJdfQ== */"
+module.exports = ".post-tile {\n  font-family: Trebuchet MS, Helvetica, sans-serif;\n  font-size: 12px; }\n  .post-tile--categories {\n    font-style: italic; }\n  .post-tile--title {\n    font-weight: bold; }\n  .post-tile--body {\n    border-top: solid 1px #e5e5e5;\n    font-size: 11px;\n    margin-top: 1em; }\n  .post-tile--image {\n  height: auto;\n  width: 100%; }\n  .post-tile--image-overlay {\n    background-color: rgba(0, 0, 0, 0.8);\n    background-image: url('preview.png');\n    background-position: center;\n    background-repeat: no-repeat;\n    bottom: 0;\n    cursor: pointer;\n    height: 100%;\n    left: 0;\n    opacity: 0;\n    position: absolute;\n    right: 0;\n    top: 0;\n    transition: .3s ease;\n    width: 100%; }\n  .post-tile--image-container {\n  position: relative;\n  width: 100%; }\n  .post-tile--image-container:hover .post-tile--image-overlay {\n    opacity: 1; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9nc2hvaGFtL0RldmVsb3BtZW50L25nLWJsb2cvc3JjL2FwcC9wb3N0cy9wb3N0LXRpbGUvcG9zdC10aWxlLmNvbXBvbmVudC5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUdBO0VBQ0UsZ0RBQWdEO0VBQ2hELGVBQWUsRUFBQTtFQUVmO0lBQ0Usa0JBQWtCLEVBQUE7RUFHcEI7SUFDRSxpQkFBaUIsRUFBQTtFQUduQjtJQUNFLDZCQWZxQztJQWdCckMsZUFBZTtJQUNmLGVBQWUsRUFBQTtFQUluQjtFQUNFLFlBQVk7RUFDWixXQUFXLEVBQUE7RUFFWDtJQUNFLG9DQTNCZ0M7SUE0QmhDLG9DQUEyRDtJQUMzRCwyQkFBMkI7SUFDM0IsNEJBQTRCO0lBQzVCLFNBQVM7SUFDVCxlQUFlO0lBQ2YsWUFBWTtJQUNaLE9BQU87SUFDUCxVQUFVO0lBQ1Ysa0JBQWtCO0lBQ2xCLFFBQVE7SUFDUixNQUFNO0lBQ04sb0JBQW9CO0lBQ3BCLFdBQVcsRUFBQTtFQUlmO0VBQ0Usa0JBQWtCO0VBQ2xCLFdBQVcsRUFBQTtFQUZiO0lBTU0sVUFBVSxFQUFBIiwiZmlsZSI6InNyYy9hcHAvcG9zdHMvcG9zdC10aWxlL3Bvc3QtdGlsZS5jb21wb25lbnQuc2NzcyIsInNvdXJjZXNDb250ZW50IjpbIiRvdmVybGF5LWJnLWNvbG9yOiByZ2JhKDAsIDAsIDAsIC44KTtcbiRwb3N0LXRpbGUtLWJvcmRlci10b3A6IHNvbGlkIDFweCAjZTVlNWU1O1xuXG4ucG9zdC10aWxlIHtcbiAgZm9udC1mYW1pbHk6IFRyZWJ1Y2hldCBNUywgSGVsdmV0aWNhLCBzYW5zLXNlcmlmO1xuICBmb250LXNpemU6IDEycHg7XG5cbiAgJi0tY2F0ZWdvcmllcyB7XG4gICAgZm9udC1zdHlsZTogaXRhbGljO1xuICB9XG5cbiAgJi0tdGl0bGUge1xuICAgIGZvbnQtd2VpZ2h0OiBib2xkO1xuICB9XG5cbiAgJi0tYm9keSB7XG4gICAgYm9yZGVyLXRvcDogJHBvc3QtdGlsZS0tYm9yZGVyLXRvcDtcbiAgICBmb250LXNpemU6IDExcHg7XG4gICAgbWFyZ2luLXRvcDogMWVtO1xuICB9XG59XG5cbi5wb3N0LXRpbGUtLWltYWdlIHtcbiAgaGVpZ2h0OiBhdXRvO1xuICB3aWR0aDogMTAwJTtcblxuICAmLW92ZXJsYXkge1xuICAgIGJhY2tncm91bmQtY29sb3I6ICRvdmVybGF5LWJnLWNvbG9yO1xuICAgIGJhY2tncm91bmQtaW1hZ2U6IHVybCgnLi4vLi4vLi4vYXNzZXRzL2ltYWdlcy9wcmV2aWV3LnBuZycpO1xuICAgIGJhY2tncm91bmQtcG9zaXRpb246IGNlbnRlcjtcbiAgICBiYWNrZ3JvdW5kLXJlcGVhdDogbm8tcmVwZWF0O1xuICAgIGJvdHRvbTogMDtcbiAgICBjdXJzb3I6IHBvaW50ZXI7XG4gICAgaGVpZ2h0OiAxMDAlO1xuICAgIGxlZnQ6IDA7XG4gICAgb3BhY2l0eTogMDtcbiAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgcmlnaHQ6IDA7XG4gICAgdG9wOiAwO1xuICAgIHRyYW5zaXRpb246IC4zcyBlYXNlO1xuICAgIHdpZHRoOiAxMDAlO1xuICB9XG59XG5cbi5wb3N0LXRpbGUtLWltYWdlLWNvbnRhaW5lciB7XG4gIHBvc2l0aW9uOiByZWxhdGl2ZTtcbiAgd2lkdGg6IDEwMCU7XG5cbiAgJjpob3ZlciB7XG4gICAgLnBvc3QtdGlsZS0taW1hZ2Utb3ZlcmxheSB7XG4gICAgICBvcGFjaXR5OiAxO1xuICAgIH1cbiAgfVxufVxuIl19 */"
 
 /***/ }),
 
@@ -472,6 +472,9 @@ var PostTileComponent = /** @class */ (function () {
     function PostTileComponent() {
     }
     PostTileComponent.prototype.ngOnInit = function () { };
+    PostTileComponent.prototype.previewPost = function () {
+        alert("\u26A0\uFE0F UNIMPLEMENTED FEATURE!\nTHIS SHOULD PREVIEW POST ID#" + this.post.id);
+    };
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
         tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _models_post_model__WEBPACK_IMPORTED_MODULE_2__["Post"])
@@ -498,7 +501,7 @@ var PostTileComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<app-filters></app-filters>\n<div class=\"posts row\">\n  <p *ngIf=\"postsLoading$ | async\">Loading posts...</p>\n  <p *ngIf=\"!(postsLoaded$ | async) && !(postsLoading$ | async)\">\n    No posts loaded yet.\n  </p>\n  <div *ngIf=\"postsLoaded$ | async\" class=\"post-tiles-container\">\n    <app-post-tile *ngFor=\"let post of (posts$ | async)\" [post]=\"post\" class=\"col-12 col-md-3\"></app-post-tile>\n  </div>\n</div>\n"
+module.exports = "<div class=\"posts container\">\n  <p *ngIf=\"postsLoading$ | async\">Loading posts...</p>\n  <p *ngIf=\"!(postsLoaded$ | async) && !(postsLoading$ | async)\">\n    No posts loaded yet.\n  </p>\n  <div *ngIf=\"postsLoaded$ | async\" class=\"post-tiles-container row\">\n    <app-post-tile *ngFor=\"let post of (posts$ | async)\" [post]=\"post\" class=\"col-12 col-md-3\"></app-post-tile>\n  </div>\n</div>\n"
 
 /***/ }),
 
@@ -899,10 +902,10 @@ var PostsEffects = /** @class */ (function () {
                 title: post.title,
                 body: post.body,
                 image: 'https://source.unsplash.com/random/230x178?r=' + Math.random(),
-                categories: ['web', 'print'].filter(function (category) {
+                categories: ['Web', 'Print'].filter(function (category) {
                     return Math.random() > 0.5;
                 }).concat([
-                    'digital'
+                    'Digital'
                 ])
             };
         });
@@ -1195,7 +1198,7 @@ var getSelectedUser = function (state) { return state.selectedUserId; };
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"app-footer mr-auto col-sm-12 col-md-6\">\n  <app-menu></app-menu>\n  <p>\n    All images are presented as an example,\n    belongs to their rightful owners.\n  </p>\n</div>\n"
+module.exports = "<div class=\"app-footer-container row\">\n  <div class=\"app-footer mr-auto col-12 col-md-6\">\n    <app-menu [hidePaths]=\"['/home']\"></app-menu>\n    <p>\n      All images are presented as an example,\n      belongs to their rightful owners.\n    </p>\n  </div>\n</div>\n"
 
 /***/ }),
 
@@ -1251,7 +1254,7 @@ var FooterComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<nav class=\"navbar\">\n  <div class=\"navbar-expand mr-auto\">\n    <div class=\"navbar-logo\">\n      <svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"58px\" height=\"58px\">\n        <image x=\"0px\" y=\"0px\" width=\"58px\" height=\"58px\" xlink:href=\"data:img/png;base64,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\" />\n      </svg>\n    </div>\n    <span class=\"navbar-brand\" href=\"/\">I am a designer and art-director<br>from New-York</span>\n  </div>\n  <div class=\"navbar-expand ml-auto\">\n    <div class=\"navbar-nav\">\n      <app-menu></app-menu>\n    </div>\n  </div>\n</nav>\n"
+module.exports = "<nav class=\"navbar\">\n  <div class=\"navbar-expand mr-auto\">\n    <div class=\"navbar-logo\">\n      <img src=\"../../../assets/images/logo.png\">\n    </div>\n    <span class=\"navbar-brand\" href=\"/\">I am a designer and art-director<br>from New-York</span>\n  </div>\n  <div class=\"navbar-expand ml-auto\">\n    <div class=\"navbar-nav\">\n      <app-menu></app-menu>\n    </div>\n  </div>\n</nav>\n"
 
 /***/ }),
 
@@ -1363,7 +1366,7 @@ var LayoutComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"menu-wrapper row\">\n  <a class=\"nav-item nav-link\" routerLinkActive=\"active\" routerLink=\"/home\">Home</a>\n  <a class=\"nav-item nav-link\" routerLinkActive=\"active\" routerLink=\"/about\">About</a>\n  <a class=\"nav-item nav-link\" routerLinkActive=\"active\" routerLink=\"/contacts\">Contacts</a>\n</div>\n"
+module.exports = "<div class=\"menu-wrapper row\">\n  <a *ngFor=\"let route of menuRoutes\" class=\"nav-item nav-link\" routerLinkActive=\"active\" routerLink=\"{{route.path}}\">{{route.name}}</a>\n</div>\n"
 
 /***/ }),
 
@@ -1374,7 +1377,7 @@ module.exports = "<div class=\"menu-wrapper row\">\n  <a class=\"nav-item nav-li
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = ".nav-item {\n  background-color: #464646;\n  color: #fff;\n  margin: .5em;\n  padding: .5em 1em;\n  text-transform: uppercase; }\n  .nav-item.active {\n    background-color: #00aeff; }\n  .app-footer .nav-item {\n    background-color: unset;\n    color: #000; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9nc2hvaGFtL0RldmVsb3BtZW50L25nLWJsb2cvc3JjL2FwcC91aS9tZW51L21lbnUuY29tcG9uZW50LnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBS0E7RUFDRSx5QkFObUI7RUFPbkIsV0FMbUI7RUFNbkIsWUFBWTtFQUNaLGlCQUFpQjtFQUNqQix5QkFBeUIsRUFBQTtFQUwzQjtJQVFJLHlCQVp3QixFQUFBO0VBZTFCO0lBQ0UsdUJBQXVCO0lBQ3ZCLFdBZnlCLEVBQUEiLCJmaWxlIjoic3JjL2FwcC91aS9tZW51L21lbnUuY29tcG9uZW50LnNjc3MiLCJzb3VyY2VzQ29udGVudCI6WyIkbmF2LWl0ZW0tYmc6ICM0NjQ2NDYgIWRlZmF1bHQ7XG4kbmF2LWl0ZW0tYmctYWN0aXZlOiAjMDBhZWZmICFkZWZhdWx0O1xuJG5hdi1pdGVtLWNvbG9yOiAjZmZmICFkZWZhdWx0O1xuJG5hdi1pdGVtLWNvbG9yLS1mb290ZXI6ICMwMDA7XG5cbi5uYXYtaXRlbSB7XG4gIGJhY2tncm91bmQtY29sb3I6ICRuYXYtaXRlbS1iZztcbiAgY29sb3I6ICRuYXYtaXRlbS1jb2xvcjtcbiAgbWFyZ2luOiAuNWVtO1xuICBwYWRkaW5nOiAuNWVtIDFlbTtcbiAgdGV4dC10cmFuc2Zvcm06IHVwcGVyY2FzZTtcblxuICAmLmFjdGl2ZSB7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogJG5hdi1pdGVtLWJnLWFjdGl2ZTtcbiAgfVxuXG4gIC5hcHAtZm9vdGVyICYge1xuICAgIGJhY2tncm91bmQtY29sb3I6IHVuc2V0O1xuICAgIGNvbG9yOiAkbmF2LWl0ZW0tY29sb3ItLWZvb3RlcjtcbiAgfVxufVxuIl19 */"
+module.exports = ".nav-item {\n  background-color: #464646;\n  color: #fff;\n  margin: .5em;\n  padding: .5em 1em;\n  text-transform: uppercase; }\n  .nav-item.active {\n    background-color: #00aeff; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9nc2hvaGFtL0RldmVsb3BtZW50L25nLWJsb2cvc3JjL2FwcC91aS9tZW51L21lbnUuY29tcG9uZW50LnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBS0E7RUFDRSx5QkFObUI7RUFPbkIsV0FMbUI7RUFNbkIsWUFBWTtFQUNaLGlCQUFpQjtFQUNqQix5QkFBeUIsRUFBQTtFQUwzQjtJQVFJLHlCQVp3QixFQUFBIiwiZmlsZSI6InNyYy9hcHAvdWkvbWVudS9tZW51LmNvbXBvbmVudC5zY3NzIiwic291cmNlc0NvbnRlbnQiOlsiJG5hdi1pdGVtLWJnOiAjNDY0NjQ2ICFkZWZhdWx0O1xuJG5hdi1pdGVtLWJnLWFjdGl2ZTogIzAwYWVmZiAhZGVmYXVsdDtcbiRuYXYtaXRlbS1jb2xvcjogI2ZmZiAhZGVmYXVsdDtcbiRuYXYtaXRlbS1jb2xvci0tZm9vdGVyOiAjMDAwO1xuXG4ubmF2LWl0ZW0ge1xuICBiYWNrZ3JvdW5kLWNvbG9yOiAkbmF2LWl0ZW0tYmc7XG4gIGNvbG9yOiAkbmF2LWl0ZW0tY29sb3I7XG4gIG1hcmdpbjogLjVlbTtcbiAgcGFkZGluZzogLjVlbSAxZW07XG4gIHRleHQtdHJhbnNmb3JtOiB1cHBlcmNhc2U7XG5cbiAgJi5hY3RpdmUge1xuICAgIGJhY2tncm91bmQtY29sb3I6ICRuYXYtaXRlbS1iZy1hY3RpdmU7XG4gIH1cbn1cbiJdfQ== */"
 
 /***/ }),
 
@@ -1394,8 +1397,24 @@ __webpack_require__.r(__webpack_exports__);
 
 var MenuComponent = /** @class */ (function () {
     function MenuComponent() {
+        this.menuRoutes = [
+            { path: '/home', name: 'Home' },
+            { path: '/about', name: 'About' },
+            { path: '/contacts', name: 'Contacts' }
+        ];
     }
-    MenuComponent.prototype.ngOnInit = function () { };
+    MenuComponent.prototype.ngOnInit = function () {
+        var _this = this;
+        if (this.hidePaths) {
+            this.menuRoutes = this.menuRoutes.filter(function (route) {
+                return !_this.hidePaths.includes(route.path);
+            });
+        }
+    };
+    tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Array)
+    ], MenuComponent.prototype, "hidePaths", void 0);
     MenuComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
             selector: 'app-menu',
