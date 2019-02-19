@@ -1257,7 +1257,7 @@ var FooterComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<nav class=\"navbar\">\n  <div class=\"navbar-expand mr-auto\">\n    <div class=\"navbar-logo\">\n      <img src=\"../../../assets/images/logo.png\">\n    </div>\n    <span class=\"navbar-brand\" href=\"/\">I am a designer and art-director<br>from New-York</span>\n  </div>\n  <div class=\"navbar-expand ml-auto\">\n    <div class=\"navbar-nav\">\n      <app-menu></app-menu>\n    </div>\n  </div>\n</nav>\n"
+module.exports = "<nav class=\"navbar\">\n  <div class=\"navbar-expand mr-auto\">\n    <div class=\"navbar-logo\">\n      <img src=\"assets/images/logo.png\">\n    </div>\n    <span class=\"navbar-brand\" href=\"/\">I am a designer and art-director<br>from New-York</span>\n  </div>\n  <div class=\"navbar-expand ml-auto\">\n    <div class=\"navbar-nav\">\n      <app-menu></app-menu>\n    </div>\n  </div>\n</nav>\n"
 
 /***/ }),
 
