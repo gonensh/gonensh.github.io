@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sound Recorder</title>
+    <style>
+      #status {
+        margin-bottom: 10px;
+        font-weight: bold;
+      }
+      #controls {
+        margin-bottom: 10px;
+      }
+      textarea {
+        width: 100%;
+        height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Sound Recorder</h1>
+    <div id="status">
+      Microphone status: <span id="mic-status">Not checked</span>
+    </div>
+    <div id="controls">
+      <button id="start-btn">Start Recording</button>
+      <button id="stop-btn" disabled>Stop Recording</button>
+    </div>
+    <textarea
+      id="output"
+      readonly
+      placeholder="Base64 output will appear here..."
+    ></textarea>
+
+    <script>
+      let recorder;
+      const micStatus = document.getElementById('mic-status');
+      const startBtn = document.getElementById('start-btn');
+      const stopBtn = document.getElementById('stop-btn');
+      const output = document.getElementById('output');
+
+      navigator.getUserMedia =
+        navigator.getUserMedia ||
+        navigator.webkitGetUserMedia ||
+        navigator.mozGetUserMedia ||
+        navigator.msGetUserMedia;
+
+      navigator.getUserMedia(
+        {
+          audio: true,
+        },
+        (stream) => {
+          micStatus.textContent = 'Microphone access granted';
+          startBtn.disabled = false;
+
+          startBtn.addEventListener('click', () => {
+            recorder = new MediaRecorder(stream, {
+              mimeType: 'audio/ogg; codecs=opus',
+            });
+            recorder.start();
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            micStatus.textContent = 'Recording...';
+
+            recorder.ondataavailable = (e) => {
+              let reader = new FileReader();
+              reader.onloadend = () => {
+                output.value = reader.result;
+              };
+              reader.readAsDataURL(e.data);
+            };
+          });
+
+          stopBtn.addEventListener('click', () => {
+            recorder.stop();
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            micStatus.textContent =
+              'Recording stopped. See base64 output below.';
+          });
+        },
+        (e) => {
+          micStatus.textContent = 'Microphone access denied';
+          console.error('Error accessing microphone:', e);
+        }
+      );
+    </script>
+  </body>
+</html>

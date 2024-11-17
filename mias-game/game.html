@@ -1,0 +1,197 @@
+<html>
+  <head>
+    <title>Mia's Game</title>
+    <style>
+      .rainbow-box {
+        width: 80vw;
+        height: 200px;
+        border-radius: 5px;
+        background: linear-gradient(
+          90deg,
+          rgba(255, 0, 0, 1) 0%,
+          rgba(255, 154, 0, 1) 10%,
+          rgba(208, 222, 33, 1) 20%,
+          rgba(79, 220, 74, 1) 30%,
+          rgba(63, 218, 216, 1) 40%,
+          rgba(47, 201, 226, 1) 50%,
+          rgba(28, 127, 238, 1) 60%,
+          rgba(95, 21, 242, 1) 70%,
+          rgba(186, 12, 248, 1) 80%,
+          rgba(251, 7, 217, 1) 90%,
+          rgba(255, 0, 0, 1) 100%
+        );
+      }
+      button {
+        user-select: none;
+      }
+      button.game-button {
+        cursor: grab;
+      }
+      @keyframes rainbow {
+        0% {
+          background-color: rgba(255, 0, 0, 0.7); /* Red */
+        }
+        14% {
+          background-color: rgba(255, 165, 0, 0.7); /* Orange */
+        }
+        28% {
+          background-color: rgba(255, 255, 0, 0.7); /* Yellow */
+        }
+        42% {
+          background-color: rgba(0, 128, 0, 0.7); /* Green */
+        }
+        57% {
+          background-color: rgba(0, 0, 255, 0.7); /* Blue */
+        }
+        71% {
+          background-color: rgba(75, 0, 130, 0.7); /* Indigo */
+        }
+        85% {
+          background-color: rgba(238, 130, 238, 0.7); /* Violet */
+        }
+        100% {
+          background-color: rgba(255, 0, 0, 0.7); /* Red */
+        }
+      }
+      .rainbow {
+        animation: rainbow 0.5s linear;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="sounds.js"></script>
+    <script>
+      function beep() {
+        console.log('beep');
+        var sound = sounds[Math.floor(Math.random() * sounds.length)];
+        var audioInstance = new Audio(sound);
+
+        audioInstance.play();
+      }
+
+      var b = document.createElement('button');
+      buttonHeight = 100;
+      buttonWidth = 200;
+      b.innerHTML = "mia's game";
+      b.style.height = buttonHeight + 'px';
+      b.style.width = buttonWidth + 'px';
+      b.style.backgroundColor = 'white';
+      b.style.color = 'blue';
+      b.style.position = 'absolute';
+      b.style.left = 0;
+      b.classList.add('game-button');
+      // b.classList.add('rainbow-box');
+      b.addEventListener('mousedown', () => {
+        b.classList.add('rainbow');
+        beep();
+        window.score += 1;
+        setTimeout(() => {
+          b.classList.remove('rainbow');
+        }, 1000); // Duration of the rainbow animation
+      });
+
+      window.score = 0;
+      window.shouldMove = true;
+      window.xDirection = 1;
+      window.yDirection = 1;
+      window.buttonX = 1;
+      window.buttonY = 1;
+      document.body.appendChild(b);
+      clearInterval(window.buttonMotion);
+      window.speed = 5;
+      window.buttonMotion = setInterval(() => {
+        if (shouldMove) {
+          buttonX += speed * xDirection;
+          buttonY += speed * yDirection;
+        }
+        if (buttonX > window.visualViewport.width - buttonWidth)
+          xDirection = xDirection * -1;
+        if (buttonX < speed) xDirection = xDirection * -1;
+        if (buttonY > window.visualViewport.height - buttonHeight - 100)
+          yDirection = yDirection * -1;
+        if (buttonY < speed) yDirection = yDirection * -1;
+        b.style.left = buttonX + 'px';
+        b.style.top = buttonY + 'px';
+      }, 10);
+
+      var bStart = document.createElement('button');
+      bStart.innerHTML = 'Start';
+      bStart.style.height = '100px';
+      bStart.style.width = '100px';
+      bStart.style.backgroundColor = 'green';
+      bStart.style.color = 'pink';
+      bStart.style.position = 'fixed';
+      bStart.style.bottom = 0;
+      bStart.style.left = '30%';
+      bStart.addEventListener('click', () => {
+        window.shouldMove = true;
+      });
+      document.body.appendChild(bStart);
+
+      var bStop = document.createElement('button');
+      bStop.innerHTML = 'Stop';
+      bStop.style.height = '100px';
+      bStop.style.width = '100px';
+      bStop.style.backgroundColor = 'red';
+      bStop.style.color = 'pink';
+      bStop.style.position = 'fixed';
+      bStop.style.bottom = 0;
+      bStop.style.left = 'calc(30% + 115px)';
+      bStop.addEventListener('click', () => {
+        window.shouldMove = false;
+      });
+      document.body.appendChild(bStop);
+
+      var bSlower = document.createElement('button');
+      bSlower.innerHTML = 'Slower<br><span style="font-size:3em">🚜</span>';
+      bSlower.style.height = '100px';
+      bSlower.style.width = '100px';
+      bSlower.style.backgroundColor = 'red';
+      bSlower.style.color = 'pink';
+      bSlower.style.position = 'fixed';
+      bSlower.style.bottom = 0;
+      bSlower.style.left = 'calc(60%)';
+      bSlower.addEventListener('click', () => {
+        window.speed > 0
+          ? (window.speed = window.speed - 1)
+          : (window.speed = window.speed + 1);
+      });
+      document.body.appendChild(bSlower);
+
+      var bFaster = document.createElement('button');
+      bFaster.innerHTML = 'Faster<br><span style="font-size:3em">🏎️</span>';
+      bFaster.style.height = '100px';
+      bFaster.style.width = '100px';
+      bFaster.style.backgroundColor = 'red';
+      bFaster.style.color = 'pink';
+      bFaster.style.position = 'fixed';
+      bFaster.style.bottom = 0;
+      bFaster.style.left = 'calc(60% + 115px)';
+      bFaster.addEventListener('click', () => {
+        window.speed < 0
+          ? (window.speed = window.speed - 1)
+          : (window.speed = window.speed + 1);
+      });
+      document.body.appendChild(bFaster);
+
+      var counter = document.createElement('span');
+      counter.innerHTML = `Score: ${window.score}<br>Speed: ${Math.abs(
+        window.speed
+      )}`;
+      counter.style.height = '100px';
+      counter.style.width = '100px';
+      counter.style.position = 'fixed';
+      counter.style.bottom = 0;
+      counter.style.left = 'calc(45%)';
+      window.addEventListener('click', () => {
+        counter.innerHTML = `Score: ${window.score}<br>Speed: ${Math.abs(
+          window.speed
+        )}`;
+      });
+      // It's funny
+
+      document.body.appendChild(counter);
+      window.onbeforeunload = () => false;
+    </script>
+  </body>
+</html>
