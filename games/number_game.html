@@ -1,0 +1,61 @@
+<html>
+    <head>
+        <style>
+            body{
+                background-color: magenta;
+            }
+            div, input {
+                margin:auto;
+                text-align: center;
+                font-family: Arial, sans-serif;
+                margin-bottom: 40px;
+                font-size: 50px;
+            }
+        </style>
+    </head>
+  <body>
+    <div id="targetNumber">?</div>
+    <div id="message">Guess the number!</div>
+    <div id="attempts">Attempts: 0</div>
+    <div id="inputContainer">
+        <form id="inputForm">
+            <label for="userInput">Guess a number between -100 and 100:</label><br>
+            <input type="text" id="userInput" placeholder="Enter a number">
+        </form>
+  </body>
+  <script>
+    let targetNumber = Math.floor(Math.random() * 200) - 99;
+    const targetNumberElement = document.getElementById('targetNumber');
+    const messageElement = document.getElementById('message');
+    const attemptsElement = document.getElementById('attempts');
+    document.getElementById('inputForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        let userInput = parseInt(document.getElementById('userInput').value);
+        if (userInput === targetNumber) {
+            targetNumberElement.innerHTML = "🌟" + targetNumber + "🌟";
+            messageElement.innerHTML = "You guessed it! 🎉";
+            setTimeout(() => {
+                targetNumberElement.innerHTML = "?";
+                messageElement.innerHTML = "Guess the number!";
+                attemptsElement.innerHTML = "Attempts: 0";
+                targetNumber = Math.floor(Math.random() * 200) - 99;
+                document.getElementById('userInput').value = '';
+                document.getElementById('userInput').focus();
+            }, 5000);
+        } else {
+            if(userInput < -100 || userInput > 100) {
+                messageElement.innerHTML = "Please enter a number between -100 and 100.";
+                return;
+            } else if (userInput < targetNumber) {
+                messageElement.innerHTML = "Your guess " + userInput + " is too low. Try again!";
+            } else {
+                messageElement.innerHTML = "Your guess " +userInput + " is too high. Try again!";
+            }
+            attemptsElement.innerHTML = "Attempts: " + (parseInt(attemptsElement.innerHTML.split(': ')[1]) + 1);
+            document.getElementById('userInput').value = '';
+            document.getElementById('userInput').focus();
+        }
+    });
+    document.getElementById('userInput').focus();
+  </script>
+</html>

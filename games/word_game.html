@@ -1,0 +1,100 @@
+<html>
+  <head>
+    <style>
+      #canvas {
+        display: block;
+        position: absolute;
+        top: 50;
+        left: 50;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" width="200" height="200"></canvas>
+  </body>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    setUpLayout(ctx);
+    var offsetX = 50,
+      offsetY = 50,
+      originX = 0,
+      originY = 0,
+      dragging = false;
+    const line = document.getElementById('line');
+    document.addEventListener('mousedown', (e) => {
+      const x = e.x - offsetX;
+      const y = e.y - offsetY;
+      if (!dragging) {
+        dragging = true;
+        originX = x;
+        originY = y;
+        // ctx.clearRect(1, 1, 199, 199);
+        // drawSavedPaths(ctx);
+        // // line.style.width = '10px';
+        // line.style.left = originX;
+        // line.style.top = originY;
+      }
+    });
+    document.addEventListener('mousemove', (e) => {
+      const x = e.x - offsetX;
+      const y = e.y - offsetY;
+      if (dragging) {
+        if (originX == 0) originX = x;
+        if (originY == 0) originY = y;
+        // const angle = Math.atan((e.pageY - originY) / (e.pageX - originX));
+        // line.style.width = `${Math.abs(
+        //   e.pageX - originX + Math.abs(angle) * 100
+        // )}px`;
+        // line.style.transform = `rotateZ(${angle}rad)`;
+        ctx.clearRect(1, 1, 199, 199);
+        drawSavedPaths();
+        ctx.beginPath();
+        ctx.moveTo(originX, originY);
+        ctx.lineTo(x, y);
+        ctx.closePath();
+        ctx.stroke();
+        if (x == 199 || y == 199 || x == 1 || y == 1) {
+          savePath(x, y);
+          originX = x;
+          originY = y;
+          ctx.moveTo(x, y);
+        }
+      }
+    });
+    document.addEventListener('mouseup', (e) => {
+      //   const x = e.x - offsetX;
+      //   const y = e.y - offsetY;
+      dragging = false;
+      //   savePath(x, y);
+      //   ctx.moveTo(e.x, e.y);
+      //   ctx.clearRect(1, 1, 199, 199);
+    });
+
+    function setUpLayout(c) {
+      c.strokeRect(1, 1, 199, 199);
+    }
+
+    var paths = [];
+    function savePath(x, y) {
+      const [pX, pY] = paths.slice(-1);
+      if (
+        Math.round(pX) !== Math.round(x) &&
+        Math.round(pY) !== Math.round(y)
+      ) {
+        paths.push([x, y]);
+      }
+    }
+    function drawSavedPaths() {
+      ctx.moveTo(originX, originY);
+      ctx.beginPath();
+      paths.forEach((coords) => {
+        const [x, y] = coords;
+        ctx.lineTo(x, y);
+        ctx.moveTo(x, y);
+      });
+      ctx.closePath();
+      ctx.stroke();
+    }
+  </script>
+</html>

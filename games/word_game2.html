@@ -1,0 +1,293 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="heb_words.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+      #canvas {
+        position: absolute;
+        border: solid 1px #000000;
+      }
+      .letter {
+        display: block;
+        position: absolute;
+        cursor: pointer;
+        user-select: none;
+        border-radius: 2em;
+        width: 1.5em;
+        height: 1.5em;
+        line-height: 1.5em;
+        text-align: center;
+      }
+      .letter:active,
+      .letter.selected {
+        background-color: #aaaaff;
+      }
+
+      #scoreContainer {
+        direction: rtl;
+        position: absolute;
+        top: 20px;
+        left: 184px;
+        width: 7em;
+        height: 2em;
+      }
+
+      #solutionContainer {
+        position: absolute;
+        top: 30px;
+        left: 200px;
+        direction: ltr;
+        text-align: right;
+        padding: 0.5em;
+        width: 5em;
+        height: 20em;
+        border: solid 1px #000;
+      }
+      #solutionContainer li {
+        list-style: none;
+        color: #0a0;
+        text-decoration: line-through;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" width="100" height="100"></canvas>
+    <div id="scoreContainer">נקודות: 0</div>
+    <ul id="solutionContainer"></ul>
+  </body>
+  <script>
+    const letterSpacing = 30,
+      boxTopOffset = 60,
+      boxLeftOffset = 60,
+      canvasX = 50,
+      canvasY = 50;
+
+    const canvas = document.getElementById('canvas');
+    canvas.style.top = `${canvasY}px`;
+    canvas.style.left = `${canvasX}px`;
+    const ctx = canvas.getContext('2d');
+
+    const topLetters = ['ב', 'ה', 'א'],
+      leftLetters = ['ד', 'נ', 'מ'],
+      bottomLetters = ['צ', 'ר', 'ש'],
+      rightLetters = ['ע', 'ר', 'י'];
+    // solutions = [
+    //   'שיר',
+    //   'אדר',
+    //   'אמיר',
+    //   'אמנ',
+    //   'אמר',
+    //   'אצנ',
+    //   'ארב',
+    //   'ארב',
+    //   'ארד',
+    //   'ארד',
+    //   'ארמ',
+    //   'ארמה',
+    //   'ארמי',
+    //   'ארמי',
+    //   'ארנב',
+    //   'ארצ',
+    //   'ארצה',
+    //   'ארצי',
+    //   'אשד',
+    //   'דשא',
+    //   'יאמר',
+    //   'ידה',
+    //   'ימה',
+    //   'יצא',
+    //   'יצר',
+    //   'ירא',
+    //   'ירד',
+    //   'ירה',
+    //   'ישב',
+    //   'ישר',
+    //   'מהר',
+    //   'מרד',
+    //   'מרה',
+    //   'מרימה',
+    //   'מרינה',
+    //   'מריצ',
+    //   'מריצה',
+    //   'מרצ',
+    //   'מרצ',
+    //   'מרצה',
+    //   'מרצע',
+    //   'משה',
+    //   'משי',
+    //   'נצר',
+    //   'עדה',
+    //   'עדר',
+    //   'עמד',
+    //   'עמידה',
+    //   'עמיר',
+    //   'ענב',
+    //   'ענה',
+    //   'ענר',
+    //   'עצמ',
+    //   'עצמ',
+    //   'ערב',
+    //   'ערד',
+    //   'ערה',
+    //   'ערימה',
+    //   'ערמ',
+    //   'ערנ',
+    //   'עשב',
+    //   'עשה',
+    //   'צבר',
+    //   'צמה',
+    //   'צמר',
+    //   'צער',
+    //   'ראי',
+    //   'ראמ',
+    //   'רבד',
+    //   'רימה',
+    //   'רמה',
+    //   'רעב',
+    //   'רעד',
+    //   'רעה',
+    //   'רעמ',
+    //   'רעש',
+    //   'רצה',
+    //   'רשימה',
+    //   'רשמ',
+    //   'רשמה',
+    //   'רשמי',
+    //   'רשע',
+    //   'שימר',
+    //   'שמה',
+    //   'שמיר',
+    //   'שמירה',
+    //   'שמע',
+    //   'שמר',
+    //   'שער',
+    //   'שערימ',
+    //   'שרד',
+    //   'שרה',
+    //   'שרצ',
+    //   'שרצימ',
+    // ];
+
+    leftLetters.forEach((letter, i) => {
+      const e = document.createElement('div');
+      e.classList.add('left');
+      e.classList.add('letter');
+      e.innerText = letter;
+      e.style.left = '25px';
+      e.style.top = `${boxTopOffset + i * letterSpacing}px`;
+      document.body.appendChild(e);
+    });
+
+    rightLetters.forEach((letter, i) => {
+      const e = document.createElement('div');
+      e.classList.add('right');
+      e.classList.add('letter');
+      e.innerText = letter;
+      e.style.left = '155px';
+      e.style.top = `${boxTopOffset + i * letterSpacing}px`;
+      document.body.appendChild(e);
+    });
+
+    topLetters.forEach((letter, i) => {
+      const e = document.createElement('div');
+      e.classList.add('top');
+      e.classList.add('letter');
+      e.innerText = letter;
+      e.style.left = `${boxLeftOffset + i * letterSpacing}px`;
+      e.style.top = '25px';
+      document.body.appendChild(e);
+    });
+
+    bottomLetters.forEach((letter, i) => {
+      const e = document.createElement('div');
+      e.classList.add('bottom');
+      e.classList.add('letter');
+      e.innerText = letter;
+      e.style.left = `${boxLeftOffset + i * letterSpacing}px`;
+      e.style.top = '155px';
+      document.body.appendChild(e);
+    });
+
+    var inSelection = false;
+    var selectedLetters = [];
+    var lastSelectedSet = '';
+    document.addEventListener('mouseup', (e) => {
+      inSelection = false;
+      checkWord(selectedLetters.join(''));
+      selectedLetters = [];
+      ctx.reset();
+      document.querySelectorAll('.letter').forEach((l) => {
+        l.classList.remove('selected');
+      });
+    });
+    document.querySelectorAll('.letter').forEach((l) => {
+      l.addEventListener('mousedown', (e) => {
+        inSelection = true;
+        lastSelectedSet = e.target.classList.value.split(' ')[0];
+        e.target.classList.add('selected');
+        selectedLetters.push(e.target.innerText);
+        const [x, y] = getCoordinatesForLetter(e.target);
+        ctx.moveTo(x, y);
+      });
+
+      l.addEventListener('mouseover', (e) => {
+        currentSelectedSet = e.target.classList.value.split(' ')[0];
+        if (
+          inSelection &&
+          lastSelectedSet !== currentSelectedSet &&
+          !e.target.classList.contains('selected')
+        ) {
+          lastSelectedSet = currentSelectedSet;
+          e.target.classList.add('selected');
+          selectedLetters.push(e.target.innerText);
+          const [x, y] = getCoordinatesForLetter(e.target);
+          ctx.lineTo(x, y);
+          ctx.stroke();
+          ctx.moveTo(x, y);
+        }
+      });
+    });
+
+    function getCoordinatesForLetter(e) {
+      let x = e.offsetLeft + e.offsetWidth / 2 - 50,
+        y = e.offsetTop + e.offsetHeight / 2 - 50;
+      if (e.classList.contains('left')) {
+        x += 13;
+      }
+      if (e.classList.contains('right')) {
+        x -= 17;
+      }
+      if (e.classList.contains('top')) {
+        y += 13;
+      }
+      if (e.classList.contains('bottom')) {
+        y -= 17;
+      }
+      return [x, y];
+    }
+
+    var score = 0;
+    function checkWord(word) {
+      console.log(word);
+      const solutionContainer = document.getElementById('solutionContainer');
+      if (
+        // solutions.includes(word) &&
+        heb_words[word] === 1
+      ) {
+        console.log('Word found: ' + word);
+        if (solutionContainer.innerText.includes(word)) {
+          console.log('Word already found: ' + word);
+        } else {
+          const e = document.createElement('li');
+          e.innerText = word;
+          solutionContainer.appendChild(e);
+          score += word.length;
+          scoreContainer.innerText = `נקודות: ${score}`;
+        }
+      }
+    }
+  </script>
+</html>
