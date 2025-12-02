@@ -1,0 +1,144 @@
+ <html>
+     <head>
+         <title>BopIt Game</title>
+         <style>
+             span {
+                 display: block;
+                 text-align: center;
+                 margin: auto;
+                 font-size: 2em;
+             }
+             #score {
+                 font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+             }
+             #score:before {
+                 content: '🏅';
+                 padding-right: 1em;
+             }
+             #next {
+                 font-family: Helvetica, sans-serif;
+                 transition: all 0.2s;
+                 text-transform: uppercase;
+                 font-size: 5em;
+             }
+             #next:before {
+                 content: '➡️';
+                 padding-right: 1em;
+             }
+             #countdown {
+                 font-family: 'Courier New', Courier, monospace;
+             }
+             #countdown:before {
+                 content: '⏱️';
+                 padding-right: 1em;
+             }
+             #line {
+                 position: fixed;
+                 bottom: 0;
+                 left: 0;
+                 display: block;
+                 width: 1em;
+                 height: 100vh;
+                 background-color: blue;
+             }
+         </style>
+     </head>
+     <body>
+         <div>
+             <span id="score">0</span>
+             <span id="next">y</span>
+             <span id="countdown"></span>
+             <span id="note"></span>
+         </div>
+         <div id="line"></div>
+     </body>
+     <script>
+         const letterBank = ['y','m','l','g', 's', 'w', 'q', 'x', 'z', 'v', 'p', 'o', 'y', 't', 'r'];
+         let run = true, 
+         score = 0,
+         level = 1,
+         letters = letterBank.slice(0, level * 2),
+         next = letters[0],
+         countdownInterval = null,
+         countdownMs = ((6-level) || 1) * 1000;
+         highScore = parseInt(localStorage.getItem('highScore')) ?? 0;
+ 
+         const check = () => {
+             countdownMs -= 100;
+             if(countdownMs < 0) {
+                 countdownMs = 0;
+                 fail();
+             }
+             document.getElementById('countdown').innerText = (countdownMs/1000).toPrecision(4);
+         };
+ 
+         const advanceToNextLevel = () => {
+             level++;
+             letters = letterBank.slice(0, level * 2);
+             document.getElementById('note').innerText = `Level ${level}!`;
+         };
+ 
+         const start = () => {
+             score = 0;
+             next = letters[parseInt(Math.random()*letters.length)];
+             let nextEl = document.getElementById('next');
+             nextEl.style.opacity = 0.1;
+             nextEl.innerText = next;
+             setTimeout(()=>{nextEl.style.opacity = 1;},200);
+             run = true;
+             countdownMs = (6-level)*1000;
+             countdownInterval = setInterval(check, 100);
+             document.getElementById('note').innerText = '';
+         };
+         
+         const press = (char) => {
+             if(run === false) {
+                 start();
+                 return;
+             }
+             if(!/[a-zA-Z]/.test(char)) return;
+             let nextEl = document.getElementById('next');
+             if(char === next) {
+                 countdownMs = (6-level) > 1 ? (6-level) * 1000 : 1000;
+                 score++;
+                 document.getElementById('score').innerText = score;
+                 if(score % 10 === 0 && level < 5) {
+                     advanceToNextLevel();
+                 }
+ 
+                 next = letters[parseInt(Math.random()*letters.length)];
+                 nextEl.style.opacity = 0.2;
+                 nextEl.innerText = next;
+                 setTimeout(()=>{nextEl.style.opacity = 1;},200);
+             
+             }
+             else {
+                 fail(char);
+             }
+         };
+ 
+         window.addEventListener('keydown', (e) => {
+             if(e.key?.length === 1) {
+                 press(e.key);
+             }
+         });
+ 
+         const fail = (char) => {
+             clearInterval(countdownInterval);
+             if(score > highScore) { 
+                 highScore = score;
+                 localStorage.setItem('highScore', highScore);
+                 document.getElementById('note').innerText = `New High Score! 🎉 ${score} 🎉`;
+             }
+             else {
+                 document.getElementById('note').innerText = `Too Bad! You pressed ${char?.toUpperCase()}... The high score is still ${highScore}. Try again!`;
+             }
+             run = false;
+             countdownMs = 0;
+             level = 1;
+             score = 0;
+         };
+ 
+         start();
+     </script>
+ </html>
