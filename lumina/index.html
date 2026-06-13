@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumina - Gifted Learning (Hybrid Guardrails)</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 30px rgba(139, 92, 246, 0.8);
+            }
+        }
+
+        @keyframes slide-up {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pop-in {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            70% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .animate-pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+
+        .animate-slide-up {
+            animation: slide-up 0.5s ease-out forwards;
+        }
+
+        .animate-pop-in {
+            animation: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #a855f7, #3b82f6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            z-index: 1000;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- NEW HYBRID CURRICULUM DATA STRUCTURE ---
+        const curriculum = {
+            math: {
+                id: 'math',
+                title: 'Mathematics Universe',
+                color: 'from-blue-500 to-purple-600',
+                tracks: [
+                    {
+                        track_id: 'algebra_foundations',
+                        title: 'Pre-Algebra Portals',
+                        nodes: [
+                            {
+                                id: 'math-pa-1',
+                                title: 'The Balance of Power: Equations',
+                                prerequisites: [],
+                                guardrails: {
+                                    ged_standard: 'GED Math Q.4 - Solve one-variable linear equations.',
+                                    key_concepts: ['Variables as unknowns', 'The equals sign means a balanced scale', 'Inverse operations (add/subtract)'],
+                                    mastery_condition: 'User correctly solves a 2-step linear equation without hints.'
+                                }
+                            },
+                            {
+                                id: 'math-pa-2',
+                                title: 'Multiplication Magic',
+                                prerequisites: ['math-pa-1'],
+                                guardrails: {
+                                    ged_standard: 'GED Math Q.4 - Solve linear equations involving multiplication/division.',
+                                    key_concepts: ['Coefficients represent repeated addition', 'Inverse operations (multiply/divide)'],
+                                    mastery_condition: 'User isolates a variable with a fractional coefficient.'
+                                }
+                            },
+                            {
+                                id: 'math-alg-1',
+                                title: 'The Slopes of Mt. Algebra',
+                                prerequisites: ['math-pa-2'],
+                                guardrails: {
+                                    ged_standard: 'GED Math Q.8 - Find the equation of a line (y = mx + b).',
+                                    key_concepts: ['Slope as rate of change', 'Y-intercept', 'Graphing linear equations'],
+                                    mastery_condition: 'User identifies the slope and y-intercept from a word problem and constructs the linear equation.'
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        track_id: 'geometry_core',
+                        title: 'Geometry Constructs',
+                        nodes: [
+                            {
+                                id: 'math-geo-1',
+                                title: 'The Pythagorean Secret',
+                                prerequisites: ['math-pa-2'],
+                                guardrails: {
+                                    ged_standard: 'GED Math Q.7 - Use the Pythagorean theorem to find unknown side lengths.',
+                                    key_concepts: ['Right triangles only', 'Legs vs Hypotenuse', 'a² + b² = c²'],
+                                    mastery_condition: 'User calculates the hypotenuse given two integer legs.'
+                                }
+                            },
+                            {
+                                id: 'math-geo-2',
+                                title: 'Dimensional Blueprints',
+                                prerequisites: ['math-pa-2'],
+                                guardrails: {
+                                    ged_standard: 'GED Math Q.6 - Calculate dimensions, perimeter, circumference, and area of 2D figures.',
+                                    key_concepts: ['Perimeter vs Area', 'Pi in circles', 'Composite shapes'],
+                                    mastery_condition: 'User calculates the total area of a shape made of a rectangle and a semicircle.'
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            science: {
+                id: 'science',
+                title: 'Science Lab',
+                color: 'from-emerald-400 to-teal-600',
+                tracks: [
+                    {
+                        track_id: 'physics_core',
+                        title: 'Forces & Motion',
+                        nodes: [
+                            {
+                                id: 'sci-phy-1',
+                                title: 'Newton\'s First Law',
+                                prerequisites: [],
+                                guardrails: {
+                                    ged_standard: 'GED Science - Understand Newton\'s laws of motion.',
+                                    key_concepts: ['Inertia', 'Objects at rest stay at rest', 'Unbalanced forces'],
+                                    mastery_condition: 'User correctly predicts the outcome of an object acting under zero net force.'
+                                }
+                            },
+                            {
+                                id: 'sci-phy-2',
+                                title: 'Calculating Force (F=ma)',
+                                prerequisites: ['sci-phy-1', 'math-pa-1'],
+                                guardrails: {
+                                    ged_standard: 'GED Science - Apply Newton\'s 2nd Law using mathematical equations.',
+                                    key_concepts: ['Force = mass x acceleration', 'Using algebra to solve for missing variables in physics'],
+                                    mastery_condition: 'User calculates the mass of an object given the force and acceleration using inverse operations.'
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        track_id: 'bio_core',
+                        title: 'The Code of Life',
+                        nodes: [
+                            {
+                                id: 'sci-bio-1',
+                                title: 'Probability of Traits',
+                                prerequisites: ['math-pa-2'],
+                                guardrails: {
+                                    ged_standard: 'GED Science - Understand genetics, DNA, and use Punnett squares.',
+                                    key_concepts: ['Dominant vs Recessive genes', 'Punnett square setup', 'Probability calculations'],
+                                    mastery_condition: 'User correctly predicts the percentage chance of a recessive trait appearing using a Punnett square.'
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            rla: {
+                id: 'rla',
+                title: 'Literary Realm',
+                color: 'from-rose-500 to-pink-600',
+                tracks: [
+                    {
+                        track_id: 'reading_comp',
+                        title: 'The Art of Deduction',
+                        nodes: [
+                            {
+                                id: 'rla-read-1',
+                                title: 'Hunting the Main Idea',
+                                prerequisites: [],
+                                guardrails: {
+                                    ged_standard: 'GED RLA - Determine the details of what is explicitly stated and make logical inferences.',
+                                    key_concepts: ['Main Idea vs Supporting Details', 'Textual Evidence', 'Inference'],
+                                    mastery_condition: 'User reads a short paragraph and correctly identifies the implicit main idea and cites one supporting detail.'
+                                }
+                            },
+                            {
+                                id: 'rla-read-2',
+                                title: 'Unmasking the Author',
+                                prerequisites: ['rla-read-1'],
+                                guardrails: {
+                                    ged_standard: 'GED RLA - Analyze how the author organizes a text and understand author\'s purpose/point of view.',
+                                    key_concepts: ['Author\'s Tone', 'Persuade, Inform, Entertain (PIE)', 'Bias'],
+                                    mastery_condition: 'User correctly identifies an author\'s bias and primary purpose from an editorial excerpt.'
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        track_id: 'writing_core',
+                        title: 'The Architect\'s Pen',
+                        nodes: [
+                            {
+                                id: 'rla-write-1',
+                                title: 'Building an Argument',
+                                prerequisites: ['rla-read-2'],
+                                guardrails: {
+                                    ged_standard: 'GED RLA - Produce an extended response evaluating which of two texts provides the stronger argument.',
+                                    key_concepts: ['Thesis Statements', 'Claim and Counter-claim', 'Transitional words'],
+                                    mastery_condition: 'User writes a solid thesis statement and one supporting paragraph containing a clear claim and evidence.'
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            social_studies: {
+                id: 'social_studies',
+                title: 'Time Traveler\'s Guild',
+                color: 'from-amber-500 to-orange-600',
+                tracks: [
+                    {
+                        track_id: 'civics_core',
+                        title: 'Builders of Nations',
+                        nodes: [
+                            {
+                                id: 'ss-gov-1',
+                                title: 'The Three Pillars',
+                                prerequisites: [],
+                                guardrails: {
+                                    ged_standard: 'GED Social Studies - Understand the structure of the U.S. government (Civics & Govt).',
+                                    key_concepts: ['Executive Branch', 'Legislative Branch', 'Judicial Branch'],
+                                    mastery_condition: 'User accurately categorizes three different government actions into their correct branches.'
+                                }
+                            },
+                            {
+                                id: 'ss-gov-2',
+                                title: 'The Balance of Power',
+                                prerequisites: ['ss-gov-1', 'math-pa-1'],
+                                guardrails: {
+                                    ged_standard: 'GED Social Studies - Explain the system of checks and balances.',
+                                    key_concepts: ['Veto power', 'Impeachment', 'Judicial review'],
+                                    mastery_condition: 'User explains how one branch can legally prevent another branch from passing an unconstitutional law.'
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        track_id: 'econ_core',
+                        title: 'The Great Bazaar',
+                        nodes: [
+                            {
+                                id: 'ss-econ-1',
+                                title: 'The Invisible Hand',
+                                prerequisites: ['math-alg-1'],
+                                guardrails: {
+                                    ged_standard: 'GED Social Studies - Understand basic microeconomics (Supply and Demand).',
+                                    key_concepts: ['Law of Supply', 'Law of Demand', 'Equilibrium Price'],
+                                    mastery_condition: 'User analyzes a scenario where supply drops and correctly predicts the shift in the equilibrium price.'
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // Helper to find any node and its subject by node ID
+        const getNodeAndSubjectById = (targetId) => {
+            for (const subject of Object.values(curriculum)) {
+                for (const track of subject.tracks) {
+                    for (const node of track.nodes) {
+                        if (node.id === targetId) return { node, subject };
+                    }
+                }
+            }
+            return null;
+        };
+
+        class ConfettiSystem {
+            fire() {
+                const colors = ['#a855f7', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+                for (let i = 0; i < 100; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'confetti';
+                    particle.style.left = Math.random() * 100 + 'vw';
+                    particle.style.top = '-10px';
+                    particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    particle.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                    const speed = 2 + Math.random() * 3;
+                    const angle = Math.random() * Math.PI * 2;
+                    const spin = Math.random() * 360;
+                    document.body.appendChild(particle);
+                    let y = -10, x = parseFloat(particle.style.left), rot = 0;
+                    const animate = () => {
+                        y += speed; x += Math.sin(angle) * 2; rot += spin * 0.05;
+                        particle.style.transform = `translateY(${y}px) translateX(${x - parseFloat(particle.style.left)}px) rotate(${rot}deg)`;
+                        if (y < window.innerHeight) requestAnimationFrame(animate); else particle.remove();
+                    };
+                    requestAnimationFrame(animate);
+                }
+            }
+        }
+        const confetti = new ConfettiSystem();
+
+        class AIService {
+            constructor() {
+                this.apiKey = "AIzaSyBse3JcPpvqGTwrLSt4HV7h_SgBvlODE5E"; // Let the Canvas automatically provide the key securely
+                this.apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=${this.apiKey}`;
+            }
+
+            // Updated to accept completedConcepts for checkpointing
+            async generateTutorResponse(history, node, userLevel, completedConcepts = []) {
+                const pendingConcepts = node.guardrails.key_concepts.filter(c => !completedConcepts.includes(c));
+
+                const systemPrompt = `
+                You are Lumina, an enthusiastic AI tutor for a gifted 7-year-old child aiming for GED readiness.
+                
+                HYBRID GUARDRAILS (STRICT ADHERENCE REQUIRED):
+                - Topic: ${node.title}
+                - GED Standard to cover: ${node.guardrails.ged_standard}
+                - Concepts Already Mastered: ${completedConcepts.length > 0 ? completedConcepts.join(', ') : 'None yet.'}
+                - Pending Concepts to Teach: ${pendingConcepts.length > 0 ? pendingConcepts.join(', ') : 'All concepts taught! Time for the final mastery check.'}
+                - Mastery Condition: ${node.guardrails.mastery_condition}
+                
+                Your job is to teach the Pending Concepts progressively, tailoring the language to a ${userLevel}.
+
+                INSTRUCTIONS:
+                1. Keep your verbal responses EXTREMELY SUCCINCT and punchy (1-2 sentences maximum). Do NOT be wordy. Get straight to the point.
+                2. Add an intuitive visualization to EVERY response to explain the concept visually.
+                3. Write ALL mathematical expressions using LaTeX notation: $...$ for inline math (e.g. $\frac{1}{2}x = 6$) and $$...$$ for standalone equations.
+                
+                Output ONLY valid JSON matching this schema:
+                {
+                    "tutorMessage": "Your VERY SUCCINCT verbal response (1-2 sentences max).",
+                    "visualization": "JavaScript code that draws a creative, intuitive visual representation of the current concept on a 400x300 HTML5 Canvas. The code must be plain JavaScript (no HTML/markdown) and use the provided \`ctx\` (CanvasRenderingContext2D) and \`canvas\` variables. Explain the concept using visual metaphors without relying on words. ONLY output raw JavaScript code here. The visualization must be super polished, beautiful, delightful to learners, and clearly explaining the concepts being taught. Keep the colors are warm and joyful and bright, with good contrast considering a dark background.",
+                    "isCorrect": boolean (true if the user's last answer was correct, false if wrong. Null if this is the start),
+                    "celebrationType": "none" | "confetti",
+                    "completedConcept": "If the user's latest response demonstrates solid understanding of one of the Pending Concepts, output the exact string of that concept here. Otherwise null.",
+                    "masteryAchieved": boolean (TRUE ONLY if the user has met the exact Mastery Condition. Otherwise false),
+                    "nextAction": "lesson" | "question",
+                    "questionData": {
+                        "text": "The question to test comprehension.",
+                        "type": "multiple_choice" | "free_response",
+                        "options": ["Option A", "Option B", "Option C"] (Only if multiple_choice)
+                    }
+                }
+
+                RULES:
+                1. If history is empty and Concepts Already Mastered is empty, introduce the first concept in a fun way.
+                2. Do not set "masteryAchieved" to true until you are certain the user has met the exact Mastery Condition.
+                3. If the user struggles, break the concept down further. Do not just give the answer.
+                `;
+
+                const payload = {
+                    contents: history,
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    generationConfig: { responseMimeType: "application/json" }
+                };
+
+                try {
+                    const response = await fetch(this.apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    const rawText = data.candidates[0].content.parts[0].text;
+
+                    // Strip markdown formatting if the model accidentally includes it
+                    const cleanJson = rawText.replace(/```json\n?|\n?```/gi, '').trim();
+                    return JSON.parse(cleanJson);
+                } catch (error) {
+                    console.error("AI Service Error:", error);
+                    return {
+                        tutorMessage: "Whoops! My connection to the knowledge web just wobbled. Could you try answering that one more time?",
+                        isCorrect: null,
+                        celebrationType: "none",
+                        completedConcept: null,
+                        masteryAchieved: false,
+                        nextAction: "question",
+                        questionData: null
+                    };
+                }
+            }
+        }
+
+        const parseMath = (text) => {
+            const parts = [];
+            const regex = /\$\$([^$]+)\$\$|\$([^$]+)\$/g;
+            let lastIndex = 0, match;
+            while ((match = regex.exec(text)) !== null) {
+                if (match.index > lastIndex) parts.push({ type: 'text', content: text.slice(lastIndex, match.index) });
+                parts.push(match[1] !== undefined
+                    ? { type: 'block', content: match[1] }
+                    : { type: 'inline', content: match[2] });
+                lastIndex = regex.lastIndex;
+            }
+            if (lastIndex < text.length) parts.push({ type: 'text', content: text.slice(lastIndex) });
+            return parts;
+        };
+
+        const MathText = ({ text }) => {
+            if (!text) return null;
+            const parts = parseMath(text);
+            return (
+                <span>
+                    {parts.map((part, i) => {
+                        if (part.type === 'text') return <span key={i}>{part.content}</span>;
+                        try {
+                            const html = window.katex
+                                ? window.katex.renderToString(part.content, { displayMode: part.type === 'block', throwOnError: false })
+                                : part.content;
+                            return <span key={i} className={part.type === 'block' ? 'block my-2 text-center' : ''} dangerouslySetInnerHTML={{ __html: html }} />;
+                        } catch {
+                            return <span key={i}>{part.content}</span>;
+                        }
+                    })}
+                </span>
+            );
+        };
+
+        const Icon = ({ name, size = 24, className = "" }) => {
+            const icons = {
+                Brain: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z" /><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z" /><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4" /><path d="M17.599 6.5a3 3 0 0 0 .399-1.375" /></svg>,
+                Star: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>,
+                ChevronRight: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6" /></svg>,
+                Send: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m22 2-7 20-4-9-9-4Z" /><path d="M22 2 11 13" /></svg>,
+                Lock: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>,
+                Unlock: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 9.9-1" /></svg>,
+                Home: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>,
+                Sparkles: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /></svg>,
+                Target: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></svg>,
+                CheckCircle: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><path d="m9 11 3 3L22 4" /></svg>,
+                User: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+            };
+            return icons[name] || null;
+        };
+
+        const CanvasVisualizer = ({ code }) => {
+            const canvasRef = useRef(null);
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                if (!canvas || !code) return;
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                try {
+                    const drawFn = new Function('ctx', 'canvas', code);
+                    drawFn(ctx, canvas);
+                } catch (e) {
+                    console.error("Canvas drawing error:", e);
+                    ctx.fillStyle = '#ef4444';
+                    ctx.font = '14px Nunito';
+                    ctx.fillText('Visualization Error', 20, 30);
+                }
+            }, [code]);
+            return <canvas ref={canvasRef} width={400} height={300} className="w-full max-w-[400px] bg-slate-800 rounded-2xl shadow-inner mx-auto" />;
+        };
+
+        const Dashboard = ({ onSelectNode, completedNodes, onJumpToQuest }) => {
+            // Helper to check if a node is unlocked based on completed prerequisites
+            const isNodeUnlocked = (node) => {
+                if (!node.prerequisites || node.prerequisites.length === 0) return true;
+                return node.prerequisites.every(reqId => completedNodes.includes(reqId));
+            };
+
+            return (
+                <div className="max-w-6xl mx-auto p-6 animate-slide-up">
+                    <header className="flex justify-between items-center mb-12">
+                        <div>
+                            <h1 className="text-4xl font-black mb-2 flex items-center gap-3">
+                                <Icon name="Brain" size={40} className="text-purple-500 animate-float" />
+                                <span className="gradient-text">Welcome back, Explorer!</span>
+                            </h1>
+                            <p className="text-slate-400 text-lg">Modules Mastered: {completedNodes.length}</p>
+                        </div>
+                    </header>
+
+                    <div className="space-y-12">
+                        {Object.values(curriculum).map(subject => (
+                            <div key={subject.id} className="glass-panel p-8 rounded-3xl relative overflow-hidden group">
+                                <div className={`absolute top-0 right-0 w-96 h-96 bg-gradient-to-br ${subject.color} opacity-5 rounded-full blur-3xl -mr-20 -mt-20`}></div>
+
+                                <h2 className="text-3xl font-black mb-8 relative z-10 flex items-center gap-4 border-b border-slate-700/50 pb-4">
+                                    <div className={`p-3 rounded-2xl bg-gradient-to-br ${subject.color} bg-opacity-20 shadow-lg`}>
+                                        <Icon name="Sparkles" size={28} className="text-white" />
+                                    </div>
+                                    {subject.title}
+                                </h2>
+
+                                <div className="grid md:grid-cols-2 gap-8 relative z-10">
+                                    {subject.tracks.map((track) => (
+                                        <div key={track.track_id} className="space-y-4">
+                                            <h3 className="text-xl font-bold text-slate-300 flex items-center gap-2">
+                                                <Icon name="Target" size={20} className="text-slate-500" />
+                                                {track.title}
+                                            </h3>
+                                            <div className="space-y-4">
+                                                {track.nodes.map((node, idx) => {
+                                                    const isUnlocked = isNodeUnlocked(node);
+                                                    const isMastered = completedNodes.includes(node.id);
+
+                                                    return (
+                                                        <div key={node.id} className="relative group">
+                                                            <div
+                                                                onClick={() => isUnlocked && !isMastered && onSelectNode(node, subject)}
+                                                                onKeyDown={(e) => e.key === 'Enter' && isUnlocked && !isMastered && onSelectNode(node, subject)}
+                                                                role="button"
+                                                                tabIndex={isUnlocked && !isMastered ? 0 : -1}
+                                                                className={`w-full flex flex-col p-5 rounded-2xl transition-all shadow-md text-left ${isMastered ? 'bg-green-900/20 border border-green-700/50 cursor-default opacity-80' :
+                                                                    isUnlocked
+                                                                        ? 'bg-slate-800/80 hover:bg-slate-700 hover:-translate-y-1 cursor-pointer border border-slate-600 hover:border-purple-500/50'
+                                                                        : 'bg-slate-900/40 opacity-70 border border-slate-800 cursor-not-allowed'
+                                                                    }`}
+                                                            >
+                                                                <div className="flex items-center justify-between w-full">
+                                                                    <div className="flex items-center gap-4">
+                                                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isMastered ? 'bg-green-600 text-white shadow-[0_0_15px_rgba(22,163,74,0.5)]' :
+                                                                            isUnlocked ? `bg-gradient-to-br ${subject.color}` : 'bg-slate-800'
+                                                                            }`}>
+                                                                            {isMastered ? <Icon name="CheckCircle" size={18} /> : isUnlocked ? <Icon name="Unlock" size={18} /> : <Icon name="Lock" size={18} />}
+                                                                        </div>
+                                                                        <div>
+                                                                            <span className="text-xs text-slate-400 font-bold tracking-wider block mb-1">MODULE {idx + 1}</span>
+                                                                            <h4 className={`font-bold text-lg ${isMastered ? 'text-green-400' : 'text-slate-200'}`}>{node.title}</h4>
+                                                                        </div>
+                                                                    </div>
+                                                                    {isUnlocked && !isMastered && <Icon name="ChevronRight" size={24} className="text-slate-400" />}
+                                                                </div>
+
+                                                                {/* Quest Requirements Panel for Locked Nodes */}
+                                                                {!isUnlocked && node.prerequisites.length > 0 && (
+                                                                    <div className="mt-4 pt-3 border-t border-slate-800 flex flex-wrap gap-2 items-center">
+                                                                        <span className="text-xs text-slate-500 font-bold">QUEST REQUIRES:</span>
+                                                                        {node.prerequisites.map(reqId => {
+                                                                            const reqInfo = getNodeAndSubjectById(reqId);
+                                                                            const isReqMet = completedNodes.includes(reqId);
+                                                                            return (
+                                                                                <button
+                                                                                    key={reqId}
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        if (!isReqMet && reqInfo) onJumpToQuest(reqInfo.node, reqInfo.subject);
+                                                                                    }}
+                                                                                    className={`text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5 border transition-all ${isReqMet
+                                                                                        ? 'bg-green-900/20 text-green-400 border-green-800/50'
+                                                                                        : 'bg-slate-800 text-slate-300 border-slate-600 hover:border-purple-400 hover:text-purple-300 hover:shadow-[0_0_10px_rgba(168,85,247,0.4)] z-20 relative'
+                                                                                        }`}
+                                                                                >
+                                                                                    {isReqMet ? <Icon name="CheckCircle" size={12} /> : <Icon name="Target" size={12} />}
+                                                                                    {reqInfo ? reqInfo.node.title : reqId}
+                                                                                </button>
+                                                                            );
+                                                                        })}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const LearningInterface = ({ node, subject, onBack, onMastery, completedConcepts, onConceptMastery }) => {
+            const [history, setHistory] = useState([]);
+            const [isLoading, setIsLoading] = useState(true);
+            const [currentTurn, setCurrentTurn] = useState(null);
+            const [inputValue, setInputValue] = useState('');
+            const chatEndRef = useRef(null);
+
+            // Initialize the AI service instance
+            const ai = new AIService();
+
+            useEffect(() => { startLesson(); }, []);
+            useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [history, currentTurn]);
+
+            const startLesson = async () => {
+                setIsLoading(true);
+
+                // The Gemini API requires the conversation to have content and start with a user message.
+                // We inject a hidden starting prompt to initialize the lesson.
+                const initialHistory = [{ role: 'user', parts: [{ text: 'Hello Lumina! I am ready to start this module.' }] }];
+
+                // Pass completedConcepts to ensure continuity on resume
+                const response = await ai.generateTutorResponse(initialHistory, node, "Gifted 7-year old", completedConcepts);
+                setCurrentTurn(response);
+                setHistory([...initialHistory, { role: 'model', parts: [{ text: JSON.stringify(response) }] }]);
+                setIsLoading(false);
+            };
+
+            const handleSubmit = async (answerText) => {
+                if (!answerText.trim() && !currentTurn?.questionData?.options) return;
+
+                const newHistory = [...history, { role: 'user', parts: [{ text: answerText }] }];
+                setHistory(newHistory); setInputValue(''); setCurrentTurn(null); setIsLoading(true);
+
+                const response = await ai.generateTutorResponse(newHistory, node, "Gifted 7-year old", completedConcepts);
+                if (response.celebrationType === 'confetti') confetti.fire();
+
+                // Save checkpoint if a sub-concept was mastered
+                if (response.completedConcept) {
+                    onConceptMastery(response.completedConcept);
+                }
+
+                setCurrentTurn(response);
+                setHistory([...newHistory, { role: 'model', parts: [{ text: JSON.stringify(response) }] }]);
+                setIsLoading(false);
+
+                // Report mastery back to the App state
+                if (response.masteryAchieved) {
+                    onMastery();
+                    setTimeout(() => {
+                        alert("🎉 Mastery Achieved! The node has been unlocked on your map.");
+                    }, 1000);
+                }
+            };
+
+            return (
+                <div className="h-screen flex flex-col bg-[#0f172a]">
+                    <header className={`p-4 border-b border-slate-800 bg-slate-900/80 backdrop-blur-md flex items-center justify-between z-10 shadow-lg`}>
+                        <div className="flex items-center gap-4">
+                            <button onClick={onBack} className="p-3 hover:bg-slate-800 rounded-xl transition-colors text-slate-400 hover:text-white">
+                                <Icon name="Home" size={24} />
+                            </button>
+                            <div>
+                                <span className={`text-xs font-bold uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r ${subject.color}`}>
+                                    {subject.title}
+                                </span>
+                                <h2 className="font-bold text-xl">{node.title}</h2>
+                                {/* Visual Milestone Tracker */}
+                                <div className="flex items-center gap-2 mt-1">
+                                    {node.guardrails.key_concepts.map((concept, i) => (
+                                        <div key={i} title={concept} className={`w-2 h-2 rounded-full ${completedConcepts.includes(concept) ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]' : 'bg-slate-700'}`}></div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        {/* Hidden Debug Panel to show Guardrails */}
+                        <div className="hidden lg:block text-xs text-slate-500 max-w-sm text-right">
+                            <strong>Target Standard:</strong> {node.guardrails.ged_standard}
+                        </div>
+                    </header>
+
+                    <div className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6">
+                        {history.map((msg, idx) => {
+                            // Skip the initial hidden dummy user message
+                            if (idx === 0) return null;
+
+                            // Skip the last message if it's the model's active currentTurn (to avoid duplication)
+                            if (msg.role === 'model' && idx === history.length - 1 && currentTurn && !isLoading) return null;
+
+                            if (msg.role === 'user') {
+                                return (
+                                    <div key={idx} className="flex gap-4 max-w-4xl mx-auto justify-end items-start animate-slide-up opacity-60">
+                                        <div className="glass-panel p-5 rounded-3xl rounded-tr-sm text-base border-r-2 border-purple-500/50 bg-purple-900/10 text-right max-w-[80%] overflow-hidden">
+                                            <div className="text-slate-300 font-medium">{msg.parts[0].text}</div>
+                                        </div>
+                                        <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0">
+                                            <Icon name="User" size={18} className="text-purple-400" />
+                                        </div>
+                                    </div>
+                                );
+                            }
+
+                            // Model message
+                            try {
+                                const data = JSON.parse(msg.parts[0].text);
+                                return (
+                                    <div key={idx} className="flex gap-4 max-w-4xl mx-auto animate-slide-up opacity-60">
+                                        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${subject.color} flex items-center justify-center shrink-0`}>
+                                            <Icon name="Sparkles" size={18} className="text-white" />
+                                        </div>
+                                        <div className="glass-panel p-5 rounded-3xl rounded-tl-sm text-base border-l-2 border-slate-600 w-full overflow-hidden">
+                                            <div><MathText text={data.tutorMessage} /></div>
+                                            {data.visualization && (
+                                                <div className="mt-4 flex justify-center items-center w-full">
+                                                    <CanvasVisualizer code={data.visualization} />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            } catch (e) {
+                                console.error("Error parsing model message in history:", e);
+                                return null;
+                            }
+                        })}
+
+                        {isLoading && (
+                            <div className="flex gap-5 max-w-4xl mx-auto animate-slide-up">
+                                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${subject.color} flex items-center justify-center shrink-0 animate-pulse-glow`}>
+                                    <Icon name="Sparkles" size={28} className="text-white" />
+                                </div>
+                                <div className="glass-panel px-6 py-5 rounded-3xl rounded-tl-sm flex items-center gap-1.5">
+                                    <span className="text-slate-400 text-sm font-semibold mr-2">Lumina is thinking</span>
+                                    <div className="w-2.5 h-2.5 rounded-full bg-purple-400 animate-bounce" style={{animationDelay: '0ms'}}></div>
+                                    <div className="w-2.5 h-2.5 rounded-full bg-purple-400 animate-bounce" style={{animationDelay: '150ms'}}></div>
+                                    <div className="w-2.5 h-2.5 rounded-full bg-purple-400 animate-bounce" style={{animationDelay: '300ms'}}></div>
+                                </div>
+                            </div>
+                        )}
+
+                        {currentTurn && !isLoading && (
+                            <div className="flex gap-5 max-w-4xl mx-auto animate-pop-in relative z-20">
+                                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${subject.color} flex items-center justify-center shrink-0 shadow-[0_0_30px_rgba(168,85,247,0.3)]`}>
+                                    <Icon name="Sparkles" size={28} className="text-white" />
+                                </div>
+                                <div className="flex-1 space-y-6 w-full overflow-hidden">
+                                    <div className={`glass-panel p-8 rounded-3xl rounded-tl-sm text-xl leading-relaxed shadow-2xl border-t border-white/10 ${currentTurn.isCorrect === true ? 'border-green-500/50 bg-green-900/10' : currentTurn.isCorrect === false ? 'border-orange-500/50 bg-orange-900/10' : ''}`}>
+                                        {currentTurn.isCorrect === true && <div className="text-green-400 font-bold mb-3 flex items-center gap-2"><Icon name="Star" size={24} /> Phenomenal!</div>}
+                                        {currentTurn.isCorrect === false && <div className="text-orange-400 font-bold mb-3 flex items-center gap-2"><Icon name="Brain" size={24} /> Interesting thought... let's pivot!</div>}
+                                        <div><MathText text={currentTurn.tutorMessage} /></div>
+                                        {currentTurn.visualization && (
+                                            <div className="mt-6 flex justify-center items-center w-full">
+                                                <CanvasVisualizer code={currentTurn.visualization} />
+                                            </div>
+                                        )}
+                                        {currentTurn.masteryAchieved && <div className="mt-4 p-3 bg-yellow-500/20 text-yellow-300 rounded-xl border border-yellow-500/50 text-sm font-bold flex items-center gap-2">🏆 Module Mastery Achieved!</div>}
+                                    </div>
+
+                                    {currentTurn.questionData && currentTurn.questionData.text && !currentTurn.masteryAchieved && (
+                                        <div className="bg-slate-800/80 p-8 rounded-3xl border border-slate-700 shadow-inner">
+                                            <h3 className="font-bold text-xl mb-6 text-purple-200"><MathText text={currentTurn.questionData.text} /></h3>
+
+                                            {currentTurn.questionData.type === 'multiple_choice' && currentTurn.questionData.options && (
+                                                <div className="grid gap-4">
+                                                    {currentTurn.questionData.options.map((opt, i) => (
+                                                        <button
+                                                            key={i}
+                                                            onClick={() => handleSubmit(opt)}
+                                                            className="text-left p-5 rounded-2xl bg-slate-900/50 border-2 border-slate-700 hover:border-purple-500 hover:bg-slate-800 transition-all font-bold text-lg text-slate-200"
+                                                        >
+                                                            <MathText text={opt} />
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            {currentTurn.questionData.type === 'free_response' && (
+                                                <form onSubmit={(e) => { e.preventDefault(); handleSubmit(inputValue); }} className="relative flex items-center">
+                                                    <input
+                                                        type="text"
+                                                        value={inputValue}
+                                                        onChange={(e) => setInputValue(e.target.value)}
+                                                        placeholder="Type your brilliant answer here..."
+                                                        className="w-full bg-slate-900/50 border-2 border-slate-700 rounded-2xl py-5 px-6 pr-20 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all font-bold text-lg"
+                                                        autoFocus
+                                                    />
+                                                    <button type="submit" disabled={!inputValue.trim()} className="absolute right-3 p-3 bg-purple-600 hover:bg-purple-500 disabled:bg-slate-700 rounded-xl transition-colors text-white shadow-lg">
+                                                        <Icon name="Send" size={24} />
+                                                    </button>
+                                                </form>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                        <div ref={chatEndRef} />
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [view, setView] = useState('dashboard');
+            const [activeNode, setActiveNode] = useState(null);
+            const [activeSubject, setActiveSubject] = useState(null);
+            // State: Tracks which modules have been successfully mastered
+            const [completedNodes, setCompletedNodes] = useState(() => {
+                try {
+                    const saved = localStorage.getItem('lumina_completedNodes');
+                    return saved ? JSON.parse(saved) : [];
+                } catch (e) {
+                    return [];
+                }
+            });
+            // State: Tracks sub-concept checkpoints within modules: { 'node-id': ['concept 1', 'concept 2'] }
+            const [conceptProgress, setConceptProgress] = useState(() => {
+                try {
+                    const saved = localStorage.getItem('lumina_conceptProgress');
+                    return saved ? JSON.parse(saved) : {};
+                } catch (e) {
+                    return {};
+                }
+            });
+
+            useEffect(() => {
+                localStorage.setItem('lumina_completedNodes', JSON.stringify(completedNodes));
+            }, [completedNodes]);
+
+            useEffect(() => {
+                localStorage.setItem('lumina_conceptProgress', JSON.stringify(conceptProgress));
+            }, [conceptProgress]);
+
+            const handleSelectNode = (node, subject) => {
+                setActiveNode(node);
+                setActiveSubject(subject);
+                setView('learning');
+            };
+
+            const handleBackToDashboard = () => {
+                setView('dashboard');
+                setActiveNode(null);
+                setActiveSubject(null);
+            };
+
+            const handleMastery = (nodeId) => {
+                if (!completedNodes.includes(nodeId)) {
+                    setCompletedNodes([...completedNodes, nodeId]);
+                }
+            };
+
+            const handleConceptMastery = (nodeId, concept) => {
+                setConceptProgress(prev => {
+                    const current = prev[nodeId] || [];
+                    if (!current.includes(concept)) {
+                        return { ...prev, [nodeId]: [...current, concept] };
+                    }
+                    return prev;
+                });
+            };
+
+            return (
+                <div className="min-h-screen bg-slate-900 text-slate-100 selection:bg-purple-500/30">
+                    {view === 'dashboard' && (
+                        <Dashboard
+                            onSelectNode={handleSelectNode}
+                            completedNodes={completedNodes}
+                            onJumpToQuest={handleSelectNode}
+                        />
+                    )}
+                    {view === 'learning' && activeNode && activeSubject && (
+                        <LearningInterface
+                            node={activeNode}
+                            subject={activeSubject}
+                            onBack={handleBackToDashboard}
+                            onMastery={() => handleMastery(activeNode.id)}
+                            completedConcepts={conceptProgress[activeNode.id] || []}
+                            onConceptMastery={(concept) => handleConceptMastery(activeNode.id, concept)}
+                        />
+                    )}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>
