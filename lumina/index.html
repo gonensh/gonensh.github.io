@@ -407,7 +407,7 @@
                 Output ONLY valid JSON matching this schema:
                 {
                     "tutorMessage": "Your VERY SUCCINCT verbal response (1-2 sentences max).",
-                    "visualization": "JavaScript code that draws a creative, intuitive visual representation of the current concept on a 400x300 HTML5 Canvas. The code must be plain JavaScript (no HTML/markdown) and use the provided \`ctx\` (CanvasRenderingContext2D) and \`canvas\` variables. Explain the concept using visual metaphors without relying on words. ONLY output raw JavaScript code here. The visualization must be super polished, beautiful, delightful to learners, and clearly explaining the concepts being taught. Keep the colors are warm and joyful and bright, with good contrast considering a dark background.",
+                    "visualization": "JavaScript code that draws a creative, intuitive visual representation of the current concept on a 400x300 HTML5 Canvas. The code must be plain JavaScript (no HTML/markdown) and use the provided \`ctx\` (CanvasRenderingContext2D) and \`canvas\` variables. Explain the concept using visual metaphors without relying on words. ONLY output raw JavaScript code here. The visualization must be super polished, beautiful, delightful to learners, and clearly explaining the concepts being taught. Keep the colors are warm and joyful and bright, with good contrast considering a dark background. IMPORTANT: Do NOT use LaTeX notation anywhere in the canvas code. Canvas ctx.fillText() renders raw strings — use Unicode math symbols instead (e.g. '½' not '\\frac{1}{2}', 'x²' not 'x^2', 'π' not '\\pi', '√' not '\\sqrt').",
                     "isCorrect": boolean (true if the user's last answer was correct, false if wrong. Null if this is the start),
                     "celebrationType": "none" | "confetti",
                     "completedConcept": "If the user's latest response demonstrates solid understanding of one of the Pending Concepts, output the exact string of that concept here. Otherwise null.",
@@ -424,6 +424,7 @@
                 1. If history is empty and Concepts Already Mastered is empty, introduce the first concept in a fun way.
                 2. Do not set "masteryAchieved" to true until you are certain the user has met the exact Mastery Condition.
                 3. If the user struggles, break the concept down further. Do not just give the answer.
+                4. When masteryAchieved is true, tutorMessage must contain ONLY a brief congratulation — no new questions, no bonus challenges, no "now try this". The UI will offer next steps.
                 `;
 
                 const payload = {
@@ -463,6 +464,14 @@
                 }
             }
         }
+
+        const textForSpeech = (text) => {
+            if (!text) return '';
+            return text
+                .replace(/\$\$([^$]+)\$\$/g, (_, m) => ' ' + m.replace(/\\[a-zA-Z]+\{([^}]*)\}/g, '$1').replace(/[\\{}^_]/g, ' ') + ' ')
+                .replace(/\$([^$]+)\$/g, (_, m) => ' ' + m.replace(/\\[a-zA-Z]+\{([^}]*)\}/g, '$1').replace(/[\\{}^_]/g, ' ') + ' ')
+                .replace(/\s+/g, ' ').trim();
+        };
 
         const parseMath = (text) => {
             const parts = [];
@@ -511,7 +520,11 @@
                 Sparkles: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /></svg>,
                 Target: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></svg>,
                 CheckCircle: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><path d="m9 11 3 3L22 4" /></svg>,
-                User: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                User: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>,
+                Volume2: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>,
+                VolumeX: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>,
+                Mic: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>,
+                MicOff: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
             };
             return icons[name] || null;
         };
@@ -582,14 +595,15 @@
                                                     return (
                                                         <div key={node.id} className="relative group">
                                                             <div
-                                                                onClick={() => isUnlocked && !isMastered && onSelectNode(node, subject)}
-                                                                onKeyDown={(e) => e.key === 'Enter' && isUnlocked && !isMastered && onSelectNode(node, subject)}
+                                                                onClick={() => isUnlocked && onSelectNode(node, subject)}
+                                                                onKeyDown={(e) => e.key === 'Enter' && isUnlocked && onSelectNode(node, subject)}
                                                                 role="button"
-                                                                tabIndex={isUnlocked && !isMastered ? 0 : -1}
-                                                                className={`w-full flex flex-col p-5 rounded-2xl transition-all shadow-md text-left ${isMastered ? 'bg-green-900/20 border border-green-700/50 cursor-default opacity-80' :
-                                                                    isUnlocked
-                                                                        ? 'bg-slate-800/80 hover:bg-slate-700 hover:-translate-y-1 cursor-pointer border border-slate-600 hover:border-purple-500/50'
-                                                                        : 'bg-slate-900/40 opacity-70 border border-slate-800 cursor-not-allowed'
+                                                                tabIndex={isUnlocked ? 0 : -1}
+                                                                className={`w-full flex flex-col p-5 rounded-2xl transition-all shadow-md text-left ${isMastered
+                                                                        ? 'bg-green-900/20 border border-green-700/50 cursor-pointer hover:bg-green-900/30 hover:border-green-500/60 hover:-translate-y-1'
+                                                                        : isUnlocked
+                                                                            ? 'bg-slate-800/80 hover:bg-slate-700 hover:-translate-y-1 cursor-pointer border border-slate-600 hover:border-purple-500/50'
+                                                                            : 'bg-slate-900/40 opacity-70 border border-slate-800 cursor-not-allowed'
                                                                     }`}
                                                             >
                                                                 <div className="flex items-center justify-between w-full">
@@ -604,7 +618,10 @@
                                                                             <h4 className={`font-bold text-lg ${isMastered ? 'text-green-400' : 'text-slate-200'}`}>{node.title}</h4>
                                                                         </div>
                                                                     </div>
-                                                                    {isUnlocked && !isMastered && <Icon name="ChevronRight" size={24} className="text-slate-400" />}
+                                                                    {isUnlocked && (isMastered
+                                                                        ? <span className="text-xs font-bold text-green-300 bg-green-900/30 px-3 py-1 rounded-full border border-green-700/40 shrink-0">Review</span>
+                                                                        : <Icon name="ChevronRight" size={24} className="text-slate-400" />
+                                                                    )}
                                                                 </div>
 
                                                                 {/* Quest Requirements Panel for Locked Nodes */}
@@ -648,57 +665,112 @@
             );
         };
 
-        const LearningInterface = ({ node, subject, onBack, onMastery, completedConcepts, onConceptMastery }) => {
+        const LearningInterface = ({ node, subject, onBack, onMastery, completedConcepts, onConceptMastery, reviewMode = false }) => {
             const [history, setHistory] = useState([]);
             const [isLoading, setIsLoading] = useState(true);
             const [currentTurn, setCurrentTurn] = useState(null);
             const [inputValue, setInputValue] = useState('');
+            const [isMuted, setIsMuted] = useState(false);
+            const [isListening, setIsListening] = useState(false);
+            const [postMastery, setPostMastery] = useState(false);
+            const [isReplayMode, setIsReplayMode] = useState(false);
+            const [activeConcepts, setActiveConcepts] = useState(
+                reviewMode ? [...node.guardrails.key_concepts] : completedConcepts
+            );
             const chatEndRef = useRef(null);
+            const recognitionRef = useRef(null);
+            const hasSpeechRecognition = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 
             // Initialize the AI service instance
             const ai = new AIService();
 
             useEffect(() => { startLesson(); }, []);
             useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [history, currentTurn]);
+            useEffect(() => () => window.speechSynthesis.cancel(), []);
+            useEffect(() => {
+                if (!currentTurn || isMuted) return;
+                window.speechSynthesis.cancel();
+                const texts = [currentTurn.tutorMessage];
+                if (currentTurn.questionData?.text && !currentTurn.masteryAchieved) texts.push(currentTurn.questionData.text);
+                const speak = () => {
+                    const voices = window.speechSynthesis.getVoices();
+                    const voice = voices.find(v => v.name === 'Google US English') || voices.find(v => v.lang === 'en-US' && !v.localService) || voices.find(v => v.lang.startsWith('en'));
+                    texts.forEach(text => {
+                        if (!text) return;
+                        const u = new SpeechSynthesisUtterance(textForSpeech(text));
+                        u.rate = 0.92; u.pitch = 1.05;
+                        if (voice) u.voice = voice;
+                        window.speechSynthesis.speak(u);
+                    });
+                };
+                window.speechSynthesis.getVoices().length ? speak() : window.speechSynthesis.addEventListener('voiceschanged', speak, { once: true });
+            }, [currentTurn, isMuted]);
 
-            const startLesson = async () => {
+            const toggleListening = () => {
+                if (isListening) { recognitionRef.current?.stop(); return; }
+                const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SR) return;
+                const rec = new SR();
+                rec.lang = 'en-US';
+                rec.continuous = false;
+                rec.interimResults = false;
+                rec.onresult = (e) => setInputValue(e.results[0][0].transcript);
+                rec.onerror = () => setIsListening(false);
+                rec.onend = () => setIsListening(false);
+                recognitionRef.current = rec;
+                rec.start();
+                setIsListening(true);
+            };
+
+            const startLesson = async (conceptsArg) => {
                 setIsLoading(true);
-
-                // The Gemini API requires the conversation to have content and start with a user message.
-                // We inject a hidden starting prompt to initialize the lesson.
+                const concepts = conceptsArg !== undefined ? conceptsArg : (reviewMode ? [...node.guardrails.key_concepts] : completedConcepts);
                 const initialHistory = [{ role: 'user', parts: [{ text: 'Hello Lumina! I am ready to start this module.' }] }];
-
-                // Pass completedConcepts to ensure continuity on resume
-                const response = await ai.generateTutorResponse(initialHistory, node, "Gifted 7-year old", completedConcepts);
+                const response = await ai.generateTutorResponse(initialHistory, node, "Gifted 7-year old", concepts);
                 setCurrentTurn(response);
                 setHistory([...initialHistory, { role: 'model', parts: [{ text: JSON.stringify(response) }] }]);
                 setIsLoading(false);
             };
 
+            const handleReplayFromScratch = () => {
+                setIsReplayMode(true);
+                setActiveConcepts([]);
+                setHistory([]);
+                setCurrentTurn(null);
+                setPostMastery(false);
+                startLesson([]);
+            };
+
             const handleSubmit = async (answerText) => {
                 if (!answerText.trim() && !currentTurn?.questionData?.options) return;
+                window.speechSynthesis.cancel();
 
                 const newHistory = [...history, { role: 'user', parts: [{ text: answerText }] }];
                 setHistory(newHistory); setInputValue(''); setCurrentTurn(null); setIsLoading(true);
 
-                const response = await ai.generateTutorResponse(newHistory, node, "Gifted 7-year old", completedConcepts);
+                const response = await ai.generateTutorResponse(newHistory, node, "Gifted 7-year old", activeConcepts);
                 if (response.celebrationType === 'confetti') confetti.fire();
 
-                // Save checkpoint if a sub-concept was mastered
                 if (response.completedConcept) {
-                    onConceptMastery(response.completedConcept);
+                    if (!reviewMode && !isReplayMode) {
+                        onConceptMastery(response.completedConcept);
+                    }
+                    setActiveConcepts(prev =>
+                        prev.includes(response.completedConcept) ? prev : [...prev, response.completedConcept]
+                    );
                 }
 
                 setCurrentTurn(response);
                 setHistory([...newHistory, { role: 'model', parts: [{ text: JSON.stringify(response) }] }]);
                 setIsLoading(false);
 
-                // Report mastery back to the App state
                 if (response.masteryAchieved) {
                     onMastery();
-                    setTimeout(() => {
-                        alert("🎉 Mastery Achieved! The node has been unlocked on your map.");
-                    }, 1000);
+                    if (!reviewMode) {
+                        setTimeout(() => {
+                            alert("🎉 Mastery Achieved! The node has been unlocked on your map.");
+                        }, 1000);
+                    }
                 }
             };
 
@@ -709,22 +781,41 @@
                             <button onClick={onBack} className="p-3 hover:bg-slate-800 rounded-xl transition-colors text-slate-400 hover:text-white">
                                 <Icon name="Home" size={24} />
                             </button>
+                            <button onClick={() => { setIsMuted(m => { if (!m) window.speechSynthesis.cancel(); return !m; }); }} className="p-3 hover:bg-slate-800 rounded-xl transition-colors text-slate-400 hover:text-white" title={isMuted ? 'Unmute Lumina' : 'Mute Lumina'}>
+                                <Icon name={isMuted ? 'VolumeX' : 'Volume2'} size={24} />
+                            </button>
                             <div>
-                                <span className={`text-xs font-bold uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r ${subject.color}`}>
-                                    {subject.title}
-                                </span>
+                                <div className="flex items-center gap-2">
+                                    <span className={`text-xs font-bold uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r ${subject.color}`}>
+                                        {subject.title}
+                                    </span>
+                                    {reviewMode && !isReplayMode && (
+                                        <span className="text-xs font-bold text-green-300 bg-green-900/30 px-2 py-0.5 rounded-full border border-green-700/40">Review</span>
+                                    )}
+                                    {isReplayMode && (
+                                        <span className="text-xs font-bold text-amber-300 bg-amber-900/30 px-2 py-0.5 rounded-full border border-amber-700/40">Replaying</span>
+                                    )}
+                                </div>
                                 <h2 className="font-bold text-xl">{node.title}</h2>
-                                {/* Visual Milestone Tracker */}
                                 <div className="flex items-center gap-2 mt-1">
                                     {node.guardrails.key_concepts.map((concept, i) => (
-                                        <div key={i} title={concept} className={`w-2 h-2 rounded-full ${completedConcepts.includes(concept) ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]' : 'bg-slate-700'}`}></div>
+                                        <div key={i} title={concept} className={`w-2 h-2 rounded-full ${activeConcepts.includes(concept) ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]' : 'bg-slate-700'}`}></div>
                                     ))}
                                 </div>
                             </div>
                         </div>
-                        {/* Hidden Debug Panel to show Guardrails */}
-                        <div className="hidden lg:block text-xs text-slate-500 max-w-sm text-right">
-                            <strong>Target Standard:</strong> {node.guardrails.ged_standard}
+                        <div className="flex items-center gap-3">
+                            {reviewMode && !isReplayMode && (
+                                <button
+                                    onClick={handleReplayFromScratch}
+                                    className="text-xs font-bold px-3 py-2 rounded-xl border border-slate-600 text-slate-400 hover:border-amber-500/60 hover:text-amber-300 hover:bg-amber-900/10 transition-all"
+                                >
+                                    Replay from Scratch
+                                </button>
+                            )}
+                            <div className="hidden lg:block text-xs text-slate-500 max-w-sm text-right">
+                                <strong>Target Standard:</strong> {node.guardrails.ged_standard}
+                            </div>
                         </div>
                     </header>
 
@@ -740,7 +831,7 @@
                                 return (
                                     <div key={idx} className="flex gap-4 max-w-4xl mx-auto justify-end items-start animate-slide-up opacity-60">
                                         <div className="glass-panel p-5 rounded-3xl rounded-tr-sm text-base border-r-2 border-purple-500/50 bg-purple-900/10 text-right max-w-[80%] overflow-hidden">
-                                            <div className="text-slate-300 font-medium">{msg.parts[0].text}</div>
+                                            <div className="text-slate-300 font-medium"><MathText text={msg.parts[0].text} /></div>
                                         </div>
                                         <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0">
                                             <Icon name="User" size={18} className="text-purple-400" />
@@ -802,10 +893,20 @@
                                                 <CanvasVisualizer code={currentTurn.visualization} />
                                             </div>
                                         )}
-                                        {currentTurn.masteryAchieved && <div className="mt-4 p-3 bg-yellow-500/20 text-yellow-300 rounded-xl border border-yellow-500/50 text-sm font-bold flex items-center gap-2">🏆 Module Mastery Achieved!</div>}
+                                        {currentTurn.masteryAchieved && !postMastery && (
+                                            <div>
+                                                <div className="mt-4 p-3 bg-yellow-500/20 text-yellow-300 rounded-xl border border-yellow-500/50 text-sm font-bold flex items-center gap-2">🏆 Module Mastery Achieved!</div>
+                                                <button
+                                                    onClick={() => { setPostMastery(true); handleSubmit(`I completed the mastery check for ${node.title}, but I want to understand it more deeply. Can you give me a more advanced explanation or a harder challenge?`); }}
+                                                    className="mt-3 w-full py-3 px-5 rounded-2xl border-2 border-dashed border-yellow-700/40 text-yellow-500/60 hover:border-yellow-400 hover:text-yellow-300 transition-all text-sm font-semibold text-left"
+                                                >
+                                                    I want to go deeper – teach me more about <span className="italic font-normal">{node.title}</span>
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
 
-                                    {currentTurn.questionData && currentTurn.questionData.text && !currentTurn.masteryAchieved && (
+                                    {currentTurn.questionData && currentTurn.questionData.text && (!currentTurn.masteryAchieved || postMastery) && (
                                         <div className="bg-slate-800/80 p-8 rounded-3xl border border-slate-700 shadow-inner">
                                             <h3 className="font-bold text-xl mb-6 text-purple-200"><MathText text={currentTurn.questionData.text} /></h3>
 
@@ -830,14 +931,33 @@
                                                         value={inputValue}
                                                         onChange={(e) => setInputValue(e.target.value)}
                                                         placeholder="Type your brilliant answer here..."
-                                                        className="w-full bg-slate-900/50 border-2 border-slate-700 rounded-2xl py-5 px-6 pr-20 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all font-bold text-lg"
+                                                        className={`w-full bg-slate-900/50 border-2 border-slate-700 rounded-2xl py-5 px-6 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all font-bold text-lg ${hasSpeechRecognition ? 'pr-32' : 'pr-20'}`}
                                                         autoFocus
                                                     />
-                                                    <button type="submit" disabled={!inputValue.trim()} className="absolute right-3 p-3 bg-purple-600 hover:bg-purple-500 disabled:bg-slate-700 rounded-xl transition-colors text-white shadow-lg">
-                                                        <Icon name="Send" size={24} />
-                                                    </button>
+                                                    <div className="absolute right-3 flex items-center gap-2">
+                                                        {hasSpeechRecognition && (
+                                                            <button type="button" onClick={toggleListening} className={`p-3 rounded-xl transition-colors ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-slate-700 hover:bg-slate-600 text-slate-300'}`} title={isListening ? 'Stop listening' : 'Speak your answer'}>
+                                                                <Icon name={isListening ? 'MicOff' : 'Mic'} size={20} />
+                                                            </button>
+                                                        )}
+                                                        <button type="submit" disabled={!inputValue.trim()} className="p-3 bg-purple-600 hover:bg-purple-500 disabled:bg-slate-700 rounded-xl transition-colors text-white shadow-lg">
+                                                            <Icon name="Send" size={24} />
+                                                        </button>
+                                                    </div>
                                                 </form>
                                             )}
+
+                                            {(() => {
+                                                const pendingConcept = node.guardrails.key_concepts.find(c => !completedConcepts.includes(c)) || node.title;
+                                                return (
+                                                    <button
+                                                        onClick={() => handleSubmit(`I'm not sure – help me learn ${pendingConcept}. The question I'm trying to solve is: "${currentTurn.questionData.text}"`)}
+                                                        className="mt-5 w-full py-3 px-5 rounded-2xl border-2 border-dashed border-slate-600 text-slate-400 hover:border-purple-400 hover:text-purple-300 transition-all text-sm font-semibold text-left"
+                                                    >
+                                                        I'm not sure – help me learn <span className="italic font-normal">{pendingConcept}</span>
+                                                    </button>
+                                                );
+                                            })()}
                                         </div>
                                     )}
                                 </div>
@@ -925,6 +1045,7 @@
                             onMastery={() => handleMastery(activeNode.id)}
                             completedConcepts={conceptProgress[activeNode.id] || []}
                             onConceptMastery={(concept) => handleConceptMastery(activeNode.id, concept)}
+                            reviewMode={completedNodes.includes(activeNode.id)}
                         />
                     )}
                 </div>
