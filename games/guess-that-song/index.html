@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Signal — Guess That Song</title>
+
+<!-- SDK ready hook must exist BEFORE the SDK script loads -->
+<script>
+  window.__sdkReady = false;
+  window.onSpotifyWebPlaybackSDKReady = function () {
+    window.__sdkReady = true;
+    if (typeof window.__onSdk === 'function') window.__onSdk();
+  };
+</script>
+<script src="https://sdk.scdn.co/spotify-player.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#0E1220; --panel:#161B2C; --panel-2:#1B2136; --line:#28304C;
+    --amber:#F6B23C; --amber-dim:#7a5a20;
+    --cream:#F4F0E6; --muted:#8B92AB; --faint:#5b627e;
+    --ok:#56D68A; --bad:#F2708A;
+    --r:14px;
+    --disp:'Space Grotesk',system-ui,sans-serif;
+    --body:'Inter',system-ui,sans-serif;
+    --mono:'Space Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:
+      radial-gradient(900px 500px at 50% -10%, rgba(246,178,60,.10), transparent 60%),
+      var(--bg);
+    color:var(--cream); font-family:var(--body);
+    -webkit-font-smoothing:antialiased; line-height:1.5;
+    min-height:100%;
+  }
+  .wrap{max-width:560px;margin:0 auto;padding:22px 18px 60px}
+  @media (min-width:600px){ .wrap{padding-top:40px} }
+
+  /* Header */
+  header{display:flex;align-items:center;gap:11px;margin-bottom:22px}
+  .onair{
+    font-family:var(--mono);font-size:11px;letter-spacing:.18em;
+    color:var(--amber);border:1px solid var(--amber-dim);
+    padding:4px 8px;border-radius:6px;text-transform:uppercase;
+    display:inline-flex;align-items:center;gap:7px;
+  }
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 0 rgba(246,178,60,.55)}
+  .live .dot{animation:pulse 1.4s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(246,178,60,.5)}70%{box-shadow:0 0 0 8px rgba(246,178,60,0)}100%{box-shadow:0 0 0 0 rgba(246,178,60,0)}}
+  .brand{font-family:var(--disp);font-weight:700;font-size:20px;letter-spacing:.01em}
+  .brand small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.24em;color:var(--faint);font-weight:400;margin-top:1px}
+  header .spacer{flex:1}
+  .ghost-btn{background:none;border:1px solid var(--line);color:var(--muted);
+    font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:7px 10px;border-radius:8px;cursor:pointer}
+  .ghost-btn:hover{color:var(--cream);border-color:var(--faint)}
+
+  h1{font-family:var(--disp);font-weight:700;font-size:27px;line-height:1.15;margin:0 0 6px}
+  h2{font-family:var(--disp);font-weight:600;font-size:19px;margin:0 0 10px}
+  p.lead{color:var(--muted);margin:0 0 18px}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+  .card + .card{margin-top:14px}
+
+  label.fld{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 7px}
+  input[type=text]{
+    width:100%;background:var(--bg);border:1px solid var(--line);color:var(--cream);
+    font-family:var(--body);font-size:15px;padding:12px 13px;border-radius:10px;outline:none;
+  }
+  input[type=text]:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(246,178,60,.12)}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:9px;
+    width:100%;background:var(--amber);color:#20160a;border:none;
+    font-family:var(--disp);font-weight:600;font-size:15px;letter-spacing:.01em;
+    padding:13px 16px;border-radius:11px;cursor:pointer;transition:transform .06s ease,filter .15s ease;
+  }
+  .btn:hover{filter:brightness(1.06)}
+  .btn:active{transform:translateY(1px)}
+  .btn:disabled{opacity:.45;cursor:default;filter:none}
+  .btn.sec{background:var(--panel-2);color:var(--cream);border:1px solid var(--line)}
+  .row{display:flex;gap:10px}
+  .row .btn{width:auto;flex:1}
+
+  .copybox{display:flex;gap:8px;align-items:stretch;margin-top:6px}
+  .copybox code{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:9px;
+    padding:11px 12px;font-family:var(--mono);font-size:12.5px;color:var(--amber);
+    overflow:auto;white-space:nowrap}
+  .copybox button{white-space:nowrap;background:var(--panel-2);border:1px solid var(--line);color:var(--cream);
+    border-radius:9px;padding:0 13px;font-family:var(--mono);font-size:12px;cursor:pointer}
+
+  ol.steps{margin:0;padding-left:19px;color:var(--muted);font-size:14px}
+  ol.steps li{margin:0 0 9px}
+  ol.steps a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim)}
+  ol.steps b{color:var(--cream);font-weight:600}
+
+  .note{border-left:2px solid var(--amber);background:rgba(246,178,60,.06);
+    padding:11px 13px;border-radius:0 9px 9px 0;font-size:13px;color:#e8dcc4;margin-top:14px}
+  .warn{border-left:2px solid var(--bad);background:rgba(242,112,138,.08);
+    padding:11px 13px;border-radius:0 9px 9px 0;font-size:13px;color:#f6c9d2;margin-bottom:14px}
+  .warn code, .note code{font-family:var(--mono);font-size:12px;color:#fff}
+
+  .hidden{display:none !important}
+
+  /* Playlist picker */
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-left:auto}
+  .seg button{background:none;border:none;color:var(--muted);font-family:var(--mono);font-size:12px;
+    padding:8px 13px;cursor:pointer}
+  .seg button.on{background:var(--amber);color:#20160a}
+  .picker-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+  .pl{display:flex;gap:11px;align-items:center;text-align:left;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;padding:9px;cursor:pointer;color:var(--cream);transition:border-color .12s}
+  .pl:hover{border-color:var(--amber)}
+  .pl img,.pl .ph{width:52px;height:52px;border-radius:8px;object-fit:cover;flex:none;background:var(--panel-2)}
+  .pl .t{font-weight:600;font-size:14px;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .pl .c{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:3px}
+
+  /* Game */
+  .attempts{display:flex;gap:7px;margin:2px 0 16px}
+  .att{flex:1;height:5px;border-radius:3px;background:var(--panel-2)}
+  .att.used{background:var(--faint)}
+  .att.wrong{background:var(--bad)}
+  .att.now{background:var(--amber)}
+  .att.win{background:var(--ok)}
+
+  .stage{position:relative;background:linear-gradient(180deg,var(--panel-2),var(--panel));
+    border:1px solid var(--line);border-radius:16px;padding:20px 18px;overflow:hidden}
+  .stage::after{content:"";position:absolute;inset:0;background:radial-gradient(400px 160px at 50% 0%,rgba(246,178,60,.08),transparent 70%);pointer-events:none}
+
+  .timecode{font-family:var(--mono);font-size:34px;font-weight:700;letter-spacing:.02em;text-align:center;color:var(--cream)}
+  .timecode .of{color:var(--faint);font-size:16px}
+  .heard{text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-top:2px}
+
+  .timeline{position:relative;height:34px;margin:16px 2px 6px}
+  .track{position:absolute;left:0;right:0;top:14px;height:6px;border-radius:4px;background:var(--bg);border:1px solid var(--line)}
+  .fill{position:absolute;left:0;top:14px;height:6px;border-radius:4px;background:linear-gradient(90deg,#5b4a2a,var(--amber));transition:width .35s ease}
+  .head{position:absolute;top:9px;width:2px;height:16px;background:var(--cream);border-radius:2px;left:0;opacity:0;box-shadow:0 0 8px rgba(244,240,230,.8)}
+  .ticks{position:absolute;left:0;right:0;top:24px;height:12px}
+  .tick{position:absolute;transform:translateX(-50%);font-family:var(--mono);font-size:9px;color:var(--faint)}
+  .tick span{display:block;width:1px;height:5px;background:var(--line);margin:0 auto 2px}
+
+  .play-btn{display:flex;align-items:center;justify-content:center;gap:11px;width:100%;margin-top:14px;
+    background:var(--bg);border:1px solid var(--amber-dim);color:var(--amber);
+    font-family:var(--disp);font-weight:600;font-size:15px;padding:13px;border-radius:12px;cursor:pointer}
+  .play-btn:hover{background:#12172a}
+  .play-btn .tri{width:0;height:0;border-left:13px solid var(--amber);border-top:8px solid transparent;border-bottom:8px solid transparent}
+  .play-btn.playing .tri{border:none;width:12px;height:14px;position:relative}
+  .play-btn.playing .tri::before,.play-btn.playing .tri::after{content:"";position:absolute;top:0;width:4px;height:14px;background:var(--amber);border-radius:1px}
+  .play-btn.playing .tri::before{left:0}.play-btn.playing .tri::after{right:0}
+
+  .guessrow{display:flex;gap:9px;margin-top:16px}
+  .guessrow input{flex:1}
+  .guessrow .btn{width:auto;padding:12px 18px}
+  .skip{margin-top:10px;background:none;border:none;color:var(--muted);font-family:var(--mono);font-size:12px;
+    letter-spacing:.06em;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+  .skip:hover{color:var(--cream)}
+
+  .feedback{min-height:20px;text-align:center;font-size:13.5px;margin-top:12px;font-weight:500}
+  .feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)}
+
+  /* Reveal */
+  .reveal{display:flex;gap:14px;align-items:center;margin-top:4px}
+  .reveal img{width:70px;height:70px;border-radius:10px;flex:none}
+  .reveal .rn{font-family:var(--disp);font-weight:700;font-size:17px;line-height:1.2}
+  .reveal .ra{color:var(--muted);font-size:14px;margin-top:2px}
+
+  .score-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .score-top .s{font-family:var(--mono);font-size:13px;color:var(--muted)}
+  .score-top .s b{color:var(--amber)}
+
+  /* Results */
+  .bigscore{font-family:var(--disp);font-weight:700;font-size:52px;text-align:center;line-height:1}
+  .bigscore span{color:var(--amber)}
+  .sub{text-align:center;color:var(--muted);font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin:6px 0 20px}
+  .result-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+  .ri{display:flex;gap:11px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:8px 10px}
+  .ri img,.ri .ph{width:42px;height:42px;border-radius:7px;flex:none;background:var(--panel-2)}
+  .ri .rt{flex:1;min-width:0}
+  .ri .rt b{font-weight:600;font-size:14px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ri .rt small{color:var(--muted);font-size:12px}
+  .ri .pts{font-family:var(--mono);font-size:13px;font-weight:700}
+  .ri .pts.z{color:var(--bad)} .ri .pts.p{color:var(--ok)}
+
+  .center{text-align:center}
+  .spin{width:26px;height:26px;border:3px solid var(--line);border-top-color:var(--amber);border-radius:50%;animation:sp 1s linear infinite;margin:20px auto}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  a.link{color:var(--amber);text-decoration:none}
+
+  footer{margin-top:26px;text-align:center;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--faint);line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header id="hdr">
+    <div class="onair" id="onair"><span class="dot"></span>ON AIR</div>
+    <div class="brand">Signal<small>GUESS THAT SONG</small></div>
+    <div class="spacer"></div>
+    <button class="ghost-btn hidden" id="logoutBtn">Reset</button>
+  </header>
+
+  <!-- SETUP -->
+  <section id="s-setup">
+    <h1>Tune in.</h1>
+    <p class="lead">A private, no-server song-guessing game that plays from your own Spotify. One-time setup, then it just runs.</p>
+
+    <div id="hostWarn"></div>
+
+    <div class="card">
+      <h2>1 · Create a Spotify app</h2>
+      <ol class="steps">
+        <li>Open the <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener">Spotify Developer Dashboard</a> → <b>Create app</b>.</li>
+        <li>Under <b>Which API/SDKs</b>, tick <b>Web API</b> and <b>Web Playback SDK</b>.</li>
+        <li>Paste this exact <b>Redirect URI</b> into the app:
+          <div class="copybox"><code id="ruri">—</code><button id="copyR">Copy</button></div>
+        </li>
+        <li>Save. Then in <b>Settings → User Management</b>, add the Spotify email of everyone who'll play (max 5, all Premium).</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h2>2 · Paste your Client ID</h2>
+      <label class="fld" for="cid">Client ID (from the app's dashboard)</label>
+      <input type="text" id="cid" placeholder="e.g. 7fbde02f81c24c53b459988df4f72b65" autocomplete="off" spellcheck="false" />
+      <div style="height:12px"></div>
+      <button class="btn" id="saveCid">Save & continue</button>
+      <div class="note">No client secret needed — this uses Spotify's PKCE flow, which is safe to run entirely in the browser. Your Client ID stays on this device only.</div>
+    </div>
+  </section>
+
+  <!-- CONNECT -->
+  <section id="s-connect" class="hidden">
+    <h1>Ready when you are.</h1>
+    <p class="lead">Log in with the Spotify account that will play the music. It needs <b>Premium</b> and must be on your app's user list.</p>
+    <div class="card">
+      <button class="btn" id="loginBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#20160a"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm4.6 14.4a.62.62 0 01-.86.21c-2.35-1.44-5.3-1.76-8.8-.96a.62.62 0 11-.28-1.22c3.83-.87 7.1-.5 9.73 1.11.3.18.39.57.21.86zm1.23-2.73a.78.78 0 01-1.07.26c-2.69-1.65-6.79-2.13-9.97-1.17a.78.78 0 11-.45-1.49c3.63-1.1 8.15-.56 11.23 1.33.37.22.49.7.26 1.07zm.1-2.85C14.83 8.99 9.5 8.8 6.4 9.74a.93.93 0 11-.54-1.79c3.56-1.08 9.45-.87 13.18 1.35a.93.93 0 01-.95 1.6z"/></svg>
+        Log in with Spotify
+      </button>
+      <div class="note">You'll be sent to Spotify to approve, then bounced right back here.</div>
+    </div>
+    <button class="ghost-btn" id="backSetup" style="margin-top:14px">← Change Client ID</button>
+  </section>
+
+  <!-- PICKER -->
+  <section id="s-picker" class="hidden">
+    <h1 id="hiUser">Pick a playlist.</h1>
+    <p class="lead">Choose what to be quizzed on. Bigger, mixed playlists make the best rounds.</p>
+
+    <div class="picker-head">
+      <span class="fld" style="margin:0">Songs per round</span>
+      <div class="seg" id="countSeg">
+        <button data-n="5">5</button>
+        <button data-n="10" class="on">10</button>
+        <button data-n="15">15</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="fld" for="plink">Or paste a playlist link</label>
+      <div class="guessrow">
+        <input type="text" id="plink" placeholder="open.spotify.com/playlist/…" autocomplete="off" spellcheck="false"/>
+        <button class="btn" id="plinkGo">Go</button>
+      </div>
+    </div>
+
+    <div style="height:14px"></div>
+    <div id="plGrid" class="grid"></div>
+    <div id="plLoading" class="center"><div class="spin"></div></div>
+  </section>
+
+  <!-- LOADING TRACKS -->
+  <section id="s-loading" class="hidden center">
+    <div class="spin"></div>
+    <p class="lead" id="loadMsg">Loading tracks…</p>
+  </section>
+
+  <!-- GAME -->
+  <section id="s-game" class="hidden">
+    <div class="score-top">
+      <div class="s">Song <b id="qNum">1</b> / <span id="qTot">10</span></div>
+      <div class="s">Score <b id="scoreNow">0</b></div>
+    </div>
+
+    <div class="attempts" id="attempts"></div>
+
+    <div class="stage">
+      <div class="timecode"><span id="tcNow">0.0</span><span class="of"> / <span id="tcMax">1.0</span>s</span></div>
+      <div class="heard">seconds unlocked</div>
+
+      <div class="timeline">
+        <div class="track"></div>
+        <div class="fill" id="fill"></div>
+        <div class="head" id="head"></div>
+        <div class="ticks" id="ticks"></div>
+      </div>
+
+      <button class="play-btn" id="playBtn"><span class="tri"></span><span id="playLbl">Play</span></button>
+    </div>
+
+    <div class="guessrow" id="guessRow">
+      <input type="text" id="guess" placeholder="Song title…" autocomplete="off" spellcheck="false"/>
+      <button class="btn" id="guessBtn">Guess</button>
+    </div>
+    <div style="text-align:center"><button class="skip" id="skipBtn">Skip (+ unlock more) ›</button></div>
+    <div class="feedback" id="feedback"></div>
+
+    <!-- reveal (post-round) -->
+    <div id="revealCard" class="card hidden">
+      <div class="reveal">
+        <img id="rvImg" alt=""/>
+        <div>
+          <div class="rn" id="rvName"></div>
+          <div class="ra" id="rvArtist"></div>
+          <div class="ra" id="rvAlbum" style="font-size:12.5px;color:var(--faint);margin-top:1px"></div>
+          <div id="rvPts" style="font-family:var(--mono);font-size:12px;margin-top:6px"></div>
+        </div>
+      </div>
+      <div style="height:12px"></div>
+      <button class="btn" id="nextBtn">Next song ›</button>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="s-results" class="hidden">
+    <div style="height:8px"></div>
+    <div class="bigscore"><span id="finalPts">0</span></div>
+    <div class="sub"><span id="finalMax">0</span> points possible · <span id="finalSolved">0</span> nailed</div>
+    <div class="result-list" id="resultList"></div>
+    <div class="row">
+      <button class="btn sec" id="againBtn">Same playlist</button>
+      <button class="btn" id="newPlBtn">New playlist</button>
+    </div>
+  </section>
+
+  <div id="fatal"></div>
+
+  <footer>
+    Private hobby build · plays only from your own Spotify Premium account<br>
+    Not affiliated with Spotify · development-mode use only
+  </footer>
+</div>
+
+<script>
+"use strict";
+/* ---------- config ---------- */
+const SCOPES = "streaming user-read-email user-read-private playlist-read-private playlist-read-collaborative user-library-read user-modify-playback-state user-read-playback-state";
+const REDIRECT_URI = location.origin + location.pathname;
+const SNIPPETS = [1000, 2000, 4000, 7000, 11000, 16000]; // Heardle-style growth
+const MAX_ATT = SNIPPETS.length;
+const POINTS  = [6, 5, 4, 3, 2, 1]; // points for solving at attempt index
+
+/* ---------- tiny guarded storage ---------- */
+const S = {
+  get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+
+/* ---------- element helpers ---------- */
+const $ = id => document.getElementById(id);
+const show = id => $(id).classList.remove('hidden');
+const hide = id => $(id).classList.add('hidden');
+const screens = ['s-setup','s-connect','s-picker','s-loading','s-game','s-results'];
+function goto(name){ screens.forEach(s=> s===('s-'+name)?show(s):hide(s)); window.scrollTo(0,0); }
+
+/* ---------- state ---------- */
+let player=null, deviceId=null, playerReady=false;
+let round={ tracks:[], i:0, att:0, score:0, done:[] };
+let currentPl=null, songCount=10;
+let playTimer=null, tickRAF=null;
+
+/* ================= SETUP SCREEN ================= */
+$('ruri').textContent = REDIRECT_URI;
+$('copyR').onclick = () => { navigator.clipboard?.writeText(REDIRECT_URI); $('copyR').textContent='Copied'; setTimeout(()=>$('copyR').textContent='Copy',1200); };
+
+(function hostCheck(){
+  let msg='';
+  if(location.protocol==='file:') msg="You've opened this as a file. Spotify login needs a served page — run <code>python3 -m http.server 8888 --bind 127.0.0.1</code> in this folder, then open <code>http://127.0.0.1:8888</code>.";
+  else if(location.hostname==='localhost') msg="Spotify blocks <code>localhost</code> since Nov 2025. Use <code>http://127.0.0.1:"+ (location.port||'8888') +"</code> instead (same server, different address).";
+  if(msg){ $('hostWarn').innerHTML = '<div class="warn">'+msg+'</div>'; }
+})();
+
+$('saveCid').onclick = () => {
+  const v = $('cid').value.trim();
+  if(!/^[0-9a-f]{20,}$/i.test(v)){ $('cid').style.borderColor='var(--bad)'; return; }
+  S.set('cid', v); goto('connect');
+};
+$('cid').addEventListener('input', ()=> $('cid').style.borderColor='');
+$('backSetup').onclick = ()=>{ $('cid').value = S.get('cid')||''; goto('setup'); };
+$('logoutBtn').onclick = ()=>{
+  ['access_token','refresh_token','expires_at','verifier'].forEach(S.del);
+  try{ player&&player.disconnect(); }catch(e){}
+  hide('logoutBtn'); goto('connect');
+};
+
+/* ================= PKCE AUTH ================= */
+function randStr(len){
+  const c='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+  const a=crypto.getRandomValues(new Uint32Array(len)); let s='';
+  for(let i=0;i<len;i++) s+=c[a[i]%c.length]; return s;
+}
+async function sha256b64(str){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+$('loginBtn').onclick = async () => {
+  const cid = S.get('cid'); if(!cid){ goto('setup'); return; }
+  const verifier = randStr(80); S.set('verifier', verifier);
+  const challenge = await sha256b64(verifier);
+  const p = new URLSearchParams({
+    client_id: cid, response_type:'code', redirect_uri: REDIRECT_URI,
+    scope: SCOPES, code_challenge_method:'S256', code_challenge: challenge, state: randStr(16)
+  });
+  location.href = 'https://accounts.spotify.com/authorize?'+p.toString();
+};
+
+async function exchangeCode(code){
+  const body = new URLSearchParams({
+    client_id: S.get('cid'), grant_type:'authorization_code',
+    code, redirect_uri: REDIRECT_URI, code_verifier: S.get('verifier')||''
+  });
+  const r = await fetch('https://accounts.spotify.com/api/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body});
+  const d = await r.json();
+  if(d.access_token){ saveTok(d); history.replaceState({},'',REDIRECT_URI); return true; }
+  fatal("Login failed", d.error_description || d.error || "Couldn't get a token. Double-check the Redirect URI matches exactly.");
+  return false;
+}
+function saveTok(d){
+  S.set('access_token', d.access_token);
+  if(d.refresh_token) S.set('refresh_token', d.refresh_token);
+  S.set('expires_at', String(Date.now() + (d.expires_in||3600)*1000));
+}
+async function getToken(){
+  const at=S.get('access_token'), exp=+S.get('expires_at')||0;
+  if(at && Date.now() < exp-15000) return at;
+  const rt=S.get('refresh_token'); if(!rt) return null;
+  const body=new URLSearchParams({client_id:S.get('cid'),grant_type:'refresh_token',refresh_token:rt});
+  const r=await fetch('https://accounts.spotify.com/api/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body});
+  const d=await r.json();
+  if(d.access_token){ saveTok({...d, refresh_token:d.refresh_token||rt}); return d.access_token; }
+  return null;
+}
+async function api(path, opts={}){
+  const t=await getToken(); if(!t) throw new Error('no-token');
+  const r=await fetch('https://api.spotify.com/v1'+path,{...opts,headers:{...(opts.headers||{}),'Authorization':'Bearer '+t}});
+  if(r.status===204) return null;
+  if(r.status===401){ S.del('expires_at'); throw new Error('401'); }
+  if(!r.ok){ const e=await r.json().catch(()=>({})); throw new Error((e.error&&e.error.message)||('HTTP '+r.status)); }
+  return r.json();
+}
+
+/* ================= WEB PLAYBACK SDK ================= */
+function initPlayer(){
+  if(player) return;
+  player = new Spotify.Player({
+    name:'Signal · Guess That Song',
+    getOAuthToken: cb => getToken().then(t=> t&&cb(t)),
+    volume:0.85
+  });
+  player.addListener('ready', ({device_id})=>{ deviceId=device_id; playerReady=true; });
+  player.addListener('not_ready', ()=>{ playerReady=false; });
+  player.addListener('authentication_error', ({message})=> fatal("Spotify auth error", message));
+  player.addListener('account_error', ()=> fatal("Premium required","The Web Playback SDK only streams for Spotify Premium accounts. Log in with a Premium account that's on your app's user list."));
+  player.addListener('initialization_error', ({message})=> fatal("Player couldn't start", message+" — try Chrome/Firefox/Safari without strict privacy extensions."));
+  player.connect();
+}
+window.__onSdk = initPlayer;
+
+async function ensureDevice(){
+  for(let i=0;i<40 && !deviceId;i++) await new Promise(r=>setTimeout(r,150));
+  return deviceId;
+}
+async function playFrom0(uri, ms){
+  const dev = await ensureDevice();
+  if(!dev){ fatal("Player not ready","Couldn't create a Spotify playback device. Make sure this account is Premium."); return; }
+  await api('/me/player/play?device_id='+dev, {method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({uris:[uri], position_ms:0})});
+  clearTimeout(playTimer);
+  playTimer = setTimeout(async()=>{ try{ await player.pause(); }catch(e){} stopHead(); setPlaying(false); }, ms);
+  runHead(ms);
+}
+
+/* ================= PLAYLIST PICKER ================= */
+$('countSeg').addEventListener('click', e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  [...$('countSeg').children].forEach(x=>x.classList.remove('on')); b.classList.add('on');
+  songCount = +b.dataset.n;
+});
+async function loadPlaylists(){
+  show('plLoading'); $('plGrid').innerHTML='';
+  try{
+    const cards=[];
+    // Liked Songs pseudo-playlist
+    const liked = await api('/me/tracks?limit=1').catch(()=>null);
+    if(liked){ cards.push({id:'__liked__', name:'Liked Songs', total:liked.total, img:null, liked:true}); }
+    let url='/me/playlists?limit=50';
+    for(let pg=0; pg<2 && url; pg++){
+      const d=await api(url);
+      d.items.forEach(pl=>{ if(pl) cards.push({id:pl.id, name:pl.name, total:pl.tracks?.total??'?', img:pl.images?.[0]?.url}); });
+      url = d.next ? d.next.replace('https://api.spotify.com/v1','') : null;
+    }
+    hide('plLoading');
+    $('plGrid').innerHTML = cards.map(c=>`
+      <button class="pl" data-id="${c.id}" data-name="${encodeURIComponent(c.name)}" ${c.liked?'data-liked="1"':''}>
+        ${c.img?`<img src="${c.img}" alt="">`:`<div class="ph" style="display:flex;align-items:center;justify-content:center;color:var(--amber)">${c.liked?'♥':'♫'}</div>`}
+        <div><div class="t">${escapeHtml(c.name)}</div><div class="c">${c.total} tracks</div></div>
+      </button>`).join('');
+    $('plGrid').querySelectorAll('.pl').forEach(el=> el.onclick = ()=> startGame({id:el.dataset.id, name:decodeURIComponent(el.dataset.name), liked:el.dataset.liked==='1'}));
+  }catch(e){
+    hide('plLoading');
+    if(String(e.message).includes('401')||String(e.message)==='no-token') return goto('connect');
+    $('plGrid').innerHTML=`<div class="warn" style="grid-column:1/-1">Couldn't load playlists: ${escapeHtml(e.message)}</div>`;
+  }
+}
+$('plinkGo').onclick = ()=>{
+  const v=$('plink').value.trim();
+  const m = v.match(/playlist[/:]([A-Za-z0-9]+)/);
+  const id = m ? m[1] : (/^[A-Za-z0-9]{20,}$/.test(v)? v : null);
+  if(!id){ $('plink').style.borderColor='var(--bad)'; return; }
+  startGame({id, name:'Playlist'});
+};
+
+/* ================= FETCH TRACKS + BUILD ROUND ================= */
+function parseTrack(t){
+  if(!t || !t.uri || !t.uri.startsWith('spotify:track') || t.is_playable===false) return null;
+  return { uri:t.uri, name:t.name, artists:(t.artists||[]).map(a=>({name:a.name})), album:(t.album&&t.album.name)||'', img:(t.album?.images?.[0]?.url)||'' };
+}
+async function fetchTracks(pl){
+  const out=[];
+  let url = pl.liked
+    ? '/me/tracks?limit=50&market=from_token'
+    : '/playlists/'+pl.id+'/items?market=from_token&limit=100';
+  for(let pg=0; pg<6 && url; pg++){
+    const d = await api(url);
+    (d.items||[]).forEach(it=>{ const t=parseTrack(it.track||it.item||it); if(t) out.push(t); });
+    url = d.next ? d.next.replace('https://api.spotify.com/v1','') : null;
+    if(out.length>=250) break;
+  }
+  return out;
+}
+async function startGame(pl){
+  currentPl = pl; goto('loading'); $('loadMsg').textContent='Loading “'+pl.name+'”…';
+  try{
+    const all = await fetchTracks(pl);
+    if(all.length < 2){ goto('picker'); alert('That playlist has too few playable tracks. Try another.'); return; }
+    const shuffled = all.sort(()=>Math.random()-0.5);
+    const picks = shuffled.slice(0, Math.min(songCount, shuffled.length));
+    round = { tracks:picks, i:0, att:0, score:0, done:[] };
+    show('logoutBtn');
+    goto('game'); loadQuestion();
+  }catch(e){
+    if(String(e.message).includes('401')||e.message==='no-token') return goto('connect');
+    fatal("Couldn't load that playlist", e.message);
+  }
+}
+
+/* ================= GAME LOOP ================= */
+function buildTicks(){
+  const ticks=$('ticks'); ticks.innerHTML='';
+  SNIPPETS.forEach(ms=>{
+    const s=ms/1000, pct=(s/16)*100;
+    const el=document.createElement('div'); el.className='tick'; el.style.left=pct+'%';
+    el.innerHTML='<span></span>'+s; ticks.appendChild(el);
+  });
+}
+function renderAttempts(){
+  const box=$('attempts'); box.innerHTML='';
+  for(let k=0;k<MAX_ATT;k++){
+    const d=document.createElement('div'); d.className='att';
+    if(k<round.att) d.classList.add('wrong');
+    else if(k===round.att) d.classList.add('now');
+    box.appendChild(d);
+  }
+}
+function setMaxTc(){
+  const s=SNIPPETS[Math.min(round.att,MAX_ATT-1)]/1000;
+  $('tcMax').textContent=s.toFixed(1);
+  $('fill').style.width=((s/16)*100)+'%';
+  $('tcNow').textContent='0.0';
+}
+function loadQuestion(){
+  round.att=0;
+  $('qNum').textContent=round.i+1; $('qTot').textContent=round.tracks.length;
+  $('scoreNow').textContent=round.score;
+  hide('revealCard'); show('guessRow'); $('skipBtn').parentElement.classList.remove('hidden');
+  $('guess').value=''; $('feedback').textContent=''; $('feedback').className='feedback';
+  $('guess').disabled=false; $('guessBtn').disabled=false;
+  buildTicks(); renderAttempts(); setMaxTc();
+  $('guess').focus();
+}
+/* playhead animation */
+function runHead(ms){
+  setPlaying(true);
+  const maxS=SNIPPETS[Math.min(round.att,MAX_ATT-1)]/1000;
+  const head=$('head'); head.style.opacity='1';
+  const t0=performance.now();
+  cancelAnimationFrame(tickRAF);
+  (function step(now){
+    const el=(now-t0);
+    const s=Math.min(el/1000, maxS);
+    $('tcNow').textContent=s.toFixed(1);
+    head.style.left=((s/16)*100)+'%';
+    if(el<ms){ tickRAF=requestAnimationFrame(step); } else { $('tcNow').textContent=maxS.toFixed(1); }
+  })(t0);
+}
+function stopHead(){ cancelAnimationFrame(tickRAF); $('head').style.opacity='0'; }
+function setPlaying(on){
+  const b=$('playBtn'); b.classList.toggle('playing',on);
+  $('playLbl').textContent = on ? 'Playing…' : 'Play';
+  $('onair').parentElement && $('onair').classList.toggle('live',on);
+}
+$('playBtn').onclick = async ()=>{
+  if(player && player.activateElement){ try{ await player.activateElement(); }catch(e){} }
+  const tr=round.tracks[round.i];
+  const ms=SNIPPETS[Math.min(round.att,MAX_ATT-1)];
+  setMaxTc();
+  await playFrom0(tr.uri, ms);
+};
+
+/* guessing */
+function submitGuess(){
+  const tr=round.tracks[round.i];
+  const g=$('guess').value.trim(); if(!g) return;
+  if(isMatch(g, tr)){ win(); return; }
+  // wrong
+  const box=$('attempts').children[round.att];
+  round.att++;
+  $('feedback').textContent = round.att>=MAX_ATT ? 'Out of tries.' : 'Not it — a bit more unlocked.';
+  $('feedback').className='feedback bad';
+  $('guess').value='';
+  if(round.att>=MAX_ATT){ endRound(false); }
+  else { renderAttempts(); setMaxTc(); $('guess').focus(); }
+}
+$('guessBtn').onclick=submitGuess;
+$('guess').addEventListener('keydown',e=>{ if(e.key==='Enter') submitGuess(); });
+$('skipBtn').onclick=()=>{
+  round.att++;
+  if(round.att>=MAX_ATT){ $('feedback').textContent='Out of tries.'; $('feedback').className='feedback bad'; endRound(false); }
+  else { $('feedback').textContent='Skipped — more unlocked.'; $('feedback').className='feedback'; renderAttempts(); setMaxTc(); $('guess').focus(); }
+};
+function win(){
+  const pts=POINTS[round.att];
+  round.score+=pts; $('scoreNow').textContent=round.score;
+  $('feedback').textContent='Correct! +'+pts;
+  $('feedback').className='feedback ok';
+  const box=$('attempts').children[round.att]; if(box){ box.className='att win'; }
+  endRound(true, pts);
+}
+async function endRound(solved, pts=0){
+  clearTimeout(playTimer); stopHead(); try{ await player.pause(); }catch(e){} setPlaying(false);
+  const tr=round.tracks[round.i];
+  round.done.push({ tr, solved, pts: solved?pts:0, att: round.att });
+  hide('guessRow'); $('skipBtn').parentElement.classList.add('hidden');
+  $('guess').disabled=true; $('guessBtn').disabled=true;
+  $('rvImg').src=tr.img||''; $('rvName').textContent=tr.name;
+  $('rvArtist').textContent=tr.artists.map(a=>a.name).join(', ');
+  $('rvAlbum').textContent = tr.album ? 'from “'+tr.album+'”' : '';
+  $('rvPts').innerHTML = solved
+    ? '<span style="color:var(--ok)">Solved in '+(round.att+1)+' — +'+pts+'</span>'
+    : '<span style="color:var(--bad)">Missed · 0</span>';
+  $('nextBtn').textContent = (round.i>=round.tracks.length-1) ? 'See results ›' : 'Next song ›';
+  show('revealCard');
+}
+$('nextBtn').onclick=()=>{
+  round.i++;
+  if(round.i>=round.tracks.length) showResults();
+  else loadQuestion();
+};
+
+/* ================= RESULTS ================= */
+function showResults(){
+  goto('results');
+  const max=round.tracks.length*POINTS[0];
+  const solved=round.done.filter(d=>d.solved).length;
+  $('finalPts').textContent=round.score; $('finalMax').textContent=max; $('finalSolved').textContent=solved+' / '+round.tracks.length;
+  $('resultList').innerHTML = round.done.map(d=>`
+    <div class="ri">
+      ${d.tr.img?`<img src="${d.tr.img}" alt="">`:`<div class="ph"></div>`}
+      <div class="rt"><b>${escapeHtml(d.tr.name)}</b><small>${escapeHtml(d.tr.artists.map(a=>a.name).join(', '))}</small></div>
+      <div class="pts ${d.solved?'p':'z'}">${d.solved?'+'+d.pts:'—'}</div>
+    </div>`).join('');
+}
+$('againBtn').onclick=()=> startGame(currentPl);
+$('newPlBtn').onclick=()=>{ goto('picker'); loadPlaylists(); };
+
+/* ================= MATCHING ================= */
+function norm(s){
+  return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/\(.*?\)|\[.*?\]/g,' ')
+    .replace(/\b(feat|ft)\.?\b.*$/,' ')
+    .replace(/-\s*(remaster(ed)?|live|radio edit|single version|mono|stereo|version|acoustic).*$/i,' ')
+    .replace(/&/g,' and ').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+}
+function lev(a,b){
+  const m=a.length,n=b.length; if(!m)return n; if(!n)return m;
+  let prev=Array.from({length:n+1},(_,j)=>j), cur=new Array(n+1);
+  for(let i=1;i<=m;i++){ cur[0]=i;
+    for(let j=1;j<=n;j++){ const c=a[i-1]===b[j-1]?0:1; cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+c); }
+    [prev,cur]=[cur,prev];
+  }
+  return prev[n];
+}
+function isMatch(guess, tr){
+  const g=norm(guess); if(g.length<2) return false;
+  const targets=[norm(tr.name)].filter(Boolean);
+  for(const t of targets){
+    if(g===t) return true;
+    if(t.length>=6 && t.includes(g) && g.length>=4) return true;
+    if(g.includes(t) && t.length>=4) return true;
+    if(lev(g,t) <= Math.max(1, Math.floor(t.length*0.2))) return true;
+  }
+  return false;
+}
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fatal(title, msg){ $('fatal').innerHTML='<div class="warn"><b>'+escapeHtml(title)+'</b><br>'+escapeHtml(msg)+'</div>'; window.scrollTo(0,document.body.scrollHeight); }
+
+/* ================= BOOT ================= */
+(async function boot(){
+  const params=new URLSearchParams(location.search);
+  if(params.get('error')){ goto('connect'); fatal("Spotify said no", params.get('error')); return; }
+  if(params.get('code')){
+    goto('loading'); $('loadMsg').textContent='Finishing login…';
+    const ok = await exchangeCode(params.get('code'));
+    if(!ok){ goto('connect'); return; }
+  }
+  if(!S.get('cid')){ goto('setup'); return; }
+  if(await getToken()){
+    if(window.__sdkReady) initPlayer();
+    show('logoutBtn');
+    goto('picker'); loadPlaylists();
+  } else {
+    goto('connect');
+  }
+})();
+</script>
+</body>
+</html>
