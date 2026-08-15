@@ -741,7 +741,7 @@ function norm(s){
     .replace(/\(.*?\)|\[.*?\]/g,' ')
     .replace(/\b(feat|ft)\.?\b.*$/,' ')
     .replace(/-\s*(remaster(ed)?|live|radio edit|single version|mono|stereo|version|acoustic).*$/i,' ')
-    .replace(/&/g,' and ').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+    .replace(/&/g,' and ').replace(/[^\p{L}\p{N}\s]/gu,' ').replace(/\s+/g,' ').trim();
 }
 function lev(a,b){
   const m=a.length,n=b.length; if(!m)return n; if(!n)return m;
