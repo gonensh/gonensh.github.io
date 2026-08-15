@@ -160,6 +160,7 @@
     box-shadow:0 4px 0 var(--line);transition:transform .08s ease,box-shadow .08s ease}
   .play-btn:hover{background:var(--panel-2)}
   .play-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+  .play-btn:disabled{opacity:.45;cursor:default;pointer-events:none;transform:none;box-shadow:0 4px 0 var(--line)}
   .play-btn .tri{width:0;height:0;border-left:14px solid var(--amber-dim);border-top:9px solid transparent;border-bottom:9px solid transparent}
   .play-btn.playing .tri{border:none;width:13px;height:15px;position:relative}
   .play-btn.playing .tri::before,.play-btn.playing .tri::after{content:"";position:absolute;top:0;width:4px;height:15px;background:var(--amber-dim);border-radius:2px}
@@ -367,6 +368,8 @@ const REDIRECT_URI = location.origin + location.pathname;
 const SNIPPETS = [1000, 2000, 4000, 7000, 11000, 16000]; // Heardle-style growth
 const MAX_ATT = SNIPPETS.length;
 const POINTS  = [6, 5, 4, 3, 2, 1]; // points for solving at attempt index
+const SILENCE_DB = -24; // audio-analysis loudness_max below this = still silence
+const MAX_SKIP_MS = 15000; // never skip more than this much intro
 
 /* ---------- tiny guarded storage ---------- */
 const S = {
@@ -383,7 +386,7 @@ const screens = ['s-setup','s-connect','s-picker','s-loading','s-game','s-result
 function goto(name){ screens.forEach(s=> s===('s-'+name)?show(s):hide(s)); window.scrollTo(0,0); }
 
 /* ---------- state ---------- */
-let player=null, deviceId=null, playerReady=false;
+let player=null, deviceId=null, playerReady=false, lastState=null;
 let round={ tracks:[], i:0, att:0, score:0, done:[] };
 let currentPl=null, songCount=10;
 let playTimer=null, tickRAF=null;
@@ -478,6 +481,7 @@ function initPlayer(){
   });
   player.addListener('ready', ({device_id})=>{ deviceId=device_id; playerReady=true; });
   player.addListener('not_ready', ()=>{ playerReady=false; });
+  player.addListener('player_state_changed', s=>{ lastState=s; });
   player.addListener('authentication_error', ({message})=> fatal("Spotify auth error", message));
   player.addListener('account_error', ()=> fatal("Premium required","The Web Playback SDK only streams for Spotify Premium accounts. Log in with a Premium account that's on your app's user list."));
   player.addListener('initialization_error', ({message})=> fatal("Player couldn't start", message+" — try Chrome/Firefox/Safari without strict privacy extensions."));
@@ -489,10 +493,36 @@ async function ensureDevice(){
   for(let i=0;i<40 && !deviceId;i++) await new Promise(r=>setTimeout(r,150));
   return deviceId;
 }
-async function playFrom0(uri, ms){
+// Polls SDK playback state until the given track is actually buffered and
+// audible (not just requested), so the snippet timer/playhead don't start
+// ticking against dead air. `loading` may be absent on older SDK builds —
+// treat "not explicitly true" as ready rather than blocking forever.
+async function waitForBuffered(uri, timeoutMs=8000){
+  const t0=performance.now();
+  while(performance.now()-t0 < timeoutMs){
+    const s = lastState || await player.getCurrentState().catch(()=>null);
+    if(s && s.track_window?.current_track?.uri===uri && !s.paused && s.loading!==true) return true;
+    await new Promise(r=>setTimeout(r,80));
+  }
+  return false;
+}
+// Finds where a track's audio actually starts, so we can skip a silent intro.
+// Falls back to 0 if audio-analysis is unavailable (dev-mode apps created after
+// Nov 2024 may not have access to this endpoint) or the track has no such data.
+async function getStartOffsetMs(uri){
+  const id = uri.split(':')[2];
+  try{
+    const a = await api('/audio-analysis/'+id);
+    const seg = (a.segments||[]).find(s=> s.loudness_max >= SILENCE_DB);
+    if(seg) return Math.min(Math.round(seg.start*1000), MAX_SKIP_MS);
+  }catch(e){}
+  return 0;
+}
+async function playSnippet(uri, ms, offsetMs){
   const dev = await ensureDevice();
   if(!dev){ fatal("Player not ready","Couldn't create a Spotify playback device. Make sure this account is Premium."); return; }
-  await api('/me/player/play?device_id='+dev, {method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({uris:[uri], position_ms:0})});
+  await api('/me/player/play?device_id='+dev, {method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({uris:[uri], position_ms:offsetMs||0})});
+  await waitForBuffered(uri);
   clearTimeout(playTimer);
   playTimer = setTimeout(async()=>{ try{ await player.pause(); }catch(e){} stopHead(); setPlaying(false); }, ms);
   runHead(ms);
@@ -637,6 +667,16 @@ function loadQuestion(){
   $('guess').value=''; $('feedback').textContent=''; $('feedback').className='feedback';
   $('guess').disabled=false; $('guessBtn').disabled=false;
   buildTicks(); renderAttempts(); setMaxTc();
+  const tr=round.tracks[round.i];
+  if(!tr._offsetPromise) tr._offsetPromise = getStartOffsetMs(tr.uri);
+  const playBtn=$('playBtn');
+  playBtn.disabled = true; $('playLbl').textContent = 'Loading…';
+  Promise.all([ensureDevice(), tr._offsetPromise]).then(([dev])=>{
+    if(round.tracks[round.i]!==tr) return; // question moved on before this resolved
+    if(!dev){ fatal("Player not ready","Couldn't create a Spotify playback device. Make sure this account is Premium."); return; }
+    playBtn.disabled = false;
+    $('playLbl').textContent = 'Play it!';
+  });
   $('guess').focus();
 }
 /* playhead animation */
@@ -663,9 +703,17 @@ function setPlaying(on){
 $('playBtn').onclick = async ()=>{
   if(player && player.activateElement){ try{ await player.activateElement(); }catch(e){} }
   const tr=round.tracks[round.i];
+  const btn=$('playBtn');
+  btn.disabled = true; $('playLbl').textContent = 'Buffering…';
   const ms=SNIPPETS[Math.min(round.att,MAX_ATT-1)];
   setMaxTc();
-  await playFrom0(tr.uri, ms);
+  if(!tr._offsetPromise) tr._offsetPromise = getStartOffsetMs(tr.uri);
+  const offsetMs = await tr._offsetPromise;
+  await playSnippet(tr.uri, ms, offsetMs);
+  if(round.tracks[round.i]===tr){
+    btn.disabled = false;
+    if(!btn.classList.contains('playing')) $('playLbl').textContent = 'Play it!';
+  }
 };
 
 /* guessing */
