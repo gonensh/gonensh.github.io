@@ -105,6 +105,34 @@ different content source.
   failures are swallowed since `playSnippet()` still explicitly plays + waits on
   `waitForBuffered()` when the track is actually needed. Guarded per-track by
   `tr._queued` so it only fires once.
+- **Cover piles:** two fixed piles flank the column — solved covers stack on the
+  left, missed ones (greyscale) on the right. `pileAdd(tr, solved)` is called from
+  `endRound()` and flies the card in from `#rvImg` FLIP-style; `resetPiles()`
+  clears both at `startGame()`; `goto()` toggles `.piles.on` for the game and
+  results screens. The drop is deferred ~480ms via `schedulePile()` because
+  `endRound()` kicks off a *smooth* `scrollIntoView` on the reveal card, and the
+  flight is measured from the artwork's on-screen position — which is still
+  moving until that settles. Since autoplay made the round hands-free, **Next
+  can be tapped inside that window**, so `nextBtn` calls `flushPile()` to drop
+  the cover while there's still artwork to fly from; `resetPiles()` cancels a
+  pending drop instead of flushing it.
+  Card *position* is pure CSS (`--i` index × `--off` step, `--jx` cross-axis
+  jitter); only the rotation jitter is inline, which is what lets the ≤680px
+  media query flip the stack from vertical to horizontal with no JS. Stack step
+  is larger than the art, so every buried card keeps its title caption visible.
+  - **The sticky `#guessbar` owns the bottom of the viewport in-round**, so
+    `body.on-game .pile` anchors to `calc(var(--kb) + var(--barh) + 14px)` and
+    rides on top of it; on the results screen the bar is gone and the piles drop
+    to the floor. On phones the flanks disappear entirely — the piles collapse
+    into a thin cover-only ribbon above the bar, growing inward from both edges,
+    and `body.kb-open` hides them while the keyboard is up.
+  - The snap-back before the flight is flushed with a **forced reflow, not rAF**
+    (rAF is frozen while the tab isn't rendering), and the inline transform is
+    cleared on `transitionend` **and** a 900ms timer — with
+    `prefers-reduced-motion` there's no transition to end, so the timer is the
+    only thing that lands the card. For the same reason nothing but `transform`
+    is transitioned: a frozen `bottom`/`left` transition strands the card at a
+    stale value that no longer tracks `--barh`.
 - **Matching:** `norm()` (lowercase, strip diacritics, drop `(…)`/`[…]`, `feat.`,
   remaster/live tags, punctuation) → `lev()` (Levenshtein) → `isMatch()` accepts on
   exact / containment / distance ≤ 20% of target length. **Title only.**

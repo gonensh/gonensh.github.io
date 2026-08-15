@@ -214,6 +214,67 @@
   .reveal .rn{font-family:var(--disp);font-weight:700;font-size:19px;line-height:1.2}
   .reveal .ra{color:var(--muted);font-size:14px;margin-top:2px}
 
+  /* Piles — solved covers stack up on the left, missed ones on the right */
+  .piles{position:fixed;inset:0;pointer-events:none;z-index:5;display:none;
+    --cw:104px; --off:27px; --gap:24px}
+  .piles.on{display:block}
+  .pile{position:absolute;bottom:34px;width:var(--cw);height:1px}
+  .pile.got{left:max(10px, calc(50% - 280px - var(--cw) - var(--gap)))}
+  .pile.miss{right:max(10px, calc(50% - 280px - var(--cw) - var(--gap)))}
+  /* In-round the sticky bar owns the bottom of the viewport, so the piles rest on
+     top of it; on the results screen the bar is gone and they drop to the floor. */
+  body.on-game .pile{bottom:calc(var(--kb,0px) + var(--barh,150px) + 14px)}
+  .plabel{position:absolute;top:9px;left:-16px;right:-16px;text-align:center;white-space:nowrap;
+    font-family:var(--disp);font-weight:700;font-size:10px;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--faint);opacity:0;transition:opacity .3s}
+  .pile.has .plabel{opacity:1}
+  .plabel b{color:var(--amber-dim)}
+  .pile.miss .plabel b{color:var(--coral)}
+
+  .pcard{position:absolute;left:0;bottom:calc(var(--i) * var(--off));margin-left:var(--jx);
+    width:var(--cw);background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:4px;
+    box-shadow:0 4px 12px rgba(31,46,77,.16);
+    transform:rotate(var(--jr));transform-origin:50% 85%;
+    transition:transform .7s cubic-bezier(.22,1.06,.36,1)}
+  .pcard img,.pcard .pph{display:block;width:100%;aspect-ratio:1;border-radius:8px;object-fit:cover;background:var(--panel-2)}
+  .pcard .pph{display:flex;align-items:center;justify-content:center;font-size:26px}
+  .pcap{font-family:var(--body);font-weight:600;font-size:9.5px;line-height:14px;height:14px;margin-top:3px;
+    padding:0 2px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pcard.got{border-color:rgba(255,201,60,.8);box-shadow:0 4px 12px rgba(31,46,77,.16),0 0 0 3px rgba(255,201,60,.18)}
+  .pcard.miss{opacity:.72}
+  .pcard.miss img{filter:grayscale(1) contrast(.92)}
+  .pcard.miss .pcap{color:var(--faint)}
+
+  @keyframes thud{0%{transform:translateY(0)}32%{transform:translateY(5px)}64%{transform:translateY(-2px)}100%{transform:translateY(0)}}
+  .pile.thud{animation:thud .34s ease-out}
+
+  @media (max-width:1080px){ .piles{--cw:74px; --off:21px; --gap:14px} .pcap{font-size:8.5px} }
+  /* Phones: nothing flanks a 390px column, and the sticky bar already claims the
+     floor — so the piles collapse into a thin ribbon riding on top of the bar,
+     covers only, growing inward from both edges until they nearly meet. */
+  @media (max-width:680px){
+    .piles{--cw:38px; --off:13px}
+    .pile{bottom:14px}
+    body.on-game .pile{bottom:calc(var(--kb,0px) + var(--barh,150px) + 9px)}
+    .pile.got{left:12px} .pile.miss{right:12px}
+    .pcard{bottom:0;margin-left:0;margin-bottom:var(--jx);padding:3px;border-radius:8px}
+    .pile.got .pcard{left:calc(var(--i) * var(--off))}
+    .pile.miss .pcard{left:auto;right:calc(var(--i) * var(--off))}
+    .pcap,.plabel{display:none}
+    /* Reserve the ribbon's height too, so it never lands on the reveal card. */
+    body.on-game #s-game{padding-bottom:calc(var(--barh,150px) + 66px)}
+    /* While typing there's no room to spare, and the piles aren't what you're
+       looking at — let the keyboard have the screen. */
+    body.kb-open .piles{display:none}
+  }
+  /* Short desktop windows: the bar eats the height the stack needs to grow into. */
+  @media (min-width:681px) and (max-height:700px){ .piles{--cw:80px; --off:22px} }
+  /* A short landscape phone has no room for the ribbon at all. */
+  @media (max-height:430px){ .piles{display:none !important} }
+  @media (prefers-reduced-motion:reduce){
+    .pcard{transition:none} .pile.thud{animation:none}
+  }
+
   .score-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
   .score-top .s{font-family:var(--disp);font-weight:600;font-size:14px;color:var(--muted);white-space:nowrap}
   .score-top .s b{color:var(--amber-dim)}
@@ -406,6 +467,12 @@
 
   <canvas id="confettiCanvas" style="position:fixed;inset:0;pointer-events:none;z-index:9999"></canvas>
 
+  <!-- Growing piles of covers: nailed on the left, missed on the right -->
+  <div class="piles" id="piles">
+    <div class="pile got" id="pileGot"><div class="plabel" id="lblGot"></div></div>
+    <div class="pile miss" id="pileMiss"><div class="plabel" id="lblMiss"></div></div>
+  </div>
+
   <footer>
     Private hobby build · plays only from your own Spotify Premium account<br>
     Not affiliated with Spotify · development-mode use only
@@ -453,6 +520,7 @@ function goto(name){
   const inGame = name==='game';
   document.body.classList.toggle('on-game', inGame);
   $('guessbar').classList.toggle('hidden', !inGame);
+  $('piles').classList.toggle('on', inGame || name==='results');
   if(!inGame) $('guess').blur();
   syncBar(); // the bar was display:none until now, so it must be re-measured here
   window.scrollTo(0,0);
@@ -726,6 +794,7 @@ async function startGame(pl){
     const shuffled = all.sort(()=>Math.random()-0.5);
     const picks = shuffled.slice(0, Math.min(songCount, shuffled.length));
     round = { tracks:picks, i:0, att:0, score:0, done:[] };
+    resetPiles();
     show('logoutBtn');
     goto('game'); loadQuestion();
   }catch(e){
@@ -765,6 +834,89 @@ function burstConfetti(){
     if(alive && el<2200){ confettiRAF=requestAnimationFrame(step); }
     else ctx.clearRect(0,0,w,h);
   })(t0);
+}
+
+/* ================= COVER PILES =================
+   Every resolved song drops a cover onto one of two piles flanking the column:
+   solved on the left, missed on the right. Each card is jittered (rotation +
+   cross-axis offset) so the stack reads as a hand-dropped heap rather than a
+   list, and stacks with enough offset that the caption strip of every buried
+   card stays visible. Positioning lives in CSS (--i / --off / --jx) so the
+   phone layout can switch the stack from vertical to horizontal for free —
+   only the rotation is inline, and it never needs recomputing. */
+let pilePending=null;
+/* The drop is deferred until endRound()'s smooth scroll settles, but the round is
+   hands-free now and Next can land inside that window — so flush the drop before
+   the reveal goes away, while there's still artwork to fly from. */
+function schedulePile(tr, solved, delay){
+  flushPile();
+  const run = ()=>{ pilePending=null; pileAdd(tr, solved); };
+  pilePending = { timer:setTimeout(run, delay), run };
+}
+function flushPile(){
+  const p=pilePending; if(!p) return;
+  clearTimeout(p.timer); pilePending=null; p.run();
+}
+function resetPiles(){
+  if(pilePending){ clearTimeout(pilePending.timer); pilePending=null; }
+  ['pileGot','pileMiss'].forEach(id=>{
+    const p=$(id);
+    p.querySelectorAll('.pcard').forEach(c=>c.remove());
+    p.classList.remove('has');
+  });
+  $('lblGot').innerHTML=''; $('lblMiss').innerHTML='';
+}
+function pileAdd(tr, solved){
+  const pile = $(solved ? 'pileGot' : 'pileMiss');
+  const idx  = pile.querySelectorAll('.pcard').length;
+  const jx   = (Math.random()*15 - 7.5).toFixed(1);
+  const jr   = (Math.random()*13 - 6.5).toFixed(1);
+
+  const card=document.createElement('div');
+  card.className='pcard '+(solved?'got':'miss');
+  card.style.setProperty('--i', idx);
+  card.style.setProperty('--jx', jx+'px');
+  card.style.setProperty('--jr', jr+'deg');
+  card.style.zIndex = 10+idx;
+  card.title = tr.name;
+  card.innerHTML = (tr.img ? `<img src="${tr.img}" alt="">` : `<div class="pph">🎵</div>`)
+    + `<div class="pcap">${escapeHtml(tr.name)}</div>`;
+  pile.appendChild(card);
+
+  pile.classList.add('has');
+  const lbl = solved ? $('lblGot') : $('lblMiss');
+  lbl.innerHTML = (solved?'Nailed':'Missed')+' <b>'+(idx+1)+'</b>';
+
+  // Fly the card in from the reveal artwork (FLIP): measure where it landed,
+  // snap it back to the artwork, then let the transition carry it home. The
+  // snap-back is flushed with a forced reflow rather than rAF — rAF is frozen
+  // while the tab isn't rendering, which would strand the card at the artwork.
+  const src = $('rvImg').getBoundingClientRect();
+  const dest = card.getBoundingClientRect();
+  if(src.width && dest.width){
+    const dx = (src.left + src.width/2) - (dest.left + dest.width/2);
+    const dy = (src.top + src.height/2) - (dest.top + dest.height/2);
+    const sc = src.width / dest.width;
+    card.style.transition='none';
+    card.style.transform=`translate(${dx}px,${dy}px) scale(${sc}) rotate(0deg)`;
+    void card.offsetWidth;
+    card.style.transition='';
+    card.style.transform=`rotate(${jr}deg)`;
+  }
+  // Land on transitionend, but always on a timer too: with reduced motion (or a
+  // backgrounded tab) there's no transition to end, and the inline transform has
+  // to come off regardless or the card never reaches the pile.
+  let landed=false;
+  const land = () => {
+    if(landed) return; landed=true;
+    card.removeEventListener('transitionend', onEnd);
+    card.style.transform='';           // hand control back to the CSS rule
+    pile.classList.add('thud');
+    pile.addEventListener('animationend', ()=>pile.classList.remove('thud'), {once:true});
+  };
+  function onEnd(e){ if(e.propertyName==='transform') land(); }
+  card.addEventListener('transitionend', onEnd);
+  setTimeout(land, 900);
 }
 
 /* ================= GAME LOOP ================= */
@@ -933,8 +1085,12 @@ async function endRound(solved, pts=0){
   show('revealCard');
   // The bar overlays the bottom of the page; make sure the art/title landed above it.
   requestAnimationFrame(()=> $('revealCard').scrollIntoView({behavior:'smooth', block:'end'}));
+  // Fly the cover to its pile once that smooth scroll has settled — the flight is
+  // measured from the artwork's on-screen position, which is still moving until then.
+  schedulePile(tr, solved, 480);
 }
 $('nextBtn').onclick=()=>{
+  flushPile(); // drop the cover now, while the reveal artwork is still on screen
   round.i++;
   if(round.i>=round.tracks.length) showResults();
   else loadQuestion(true);
