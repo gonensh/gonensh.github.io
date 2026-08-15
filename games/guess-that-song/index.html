@@ -368,8 +368,6 @@ const REDIRECT_URI = location.origin + location.pathname;
 const SNIPPETS = [1000, 2000, 4000, 7000, 11000, 16000]; // Heardle-style growth
 const MAX_ATT = SNIPPETS.length;
 const POINTS  = [6, 5, 4, 3, 2, 1]; // points for solving at attempt index
-const SILENCE_DB = -24; // audio-analysis loudness_max below this = still silence
-const MAX_SKIP_MS = 15000; // never skip more than this much intro
 
 /* ---------- tiny guarded storage ---------- */
 const S = {
@@ -506,22 +504,10 @@ async function waitForBuffered(uri, timeoutMs=8000){
   }
   return false;
 }
-// Finds where a track's audio actually starts, so we can skip a silent intro.
-// Falls back to 0 if audio-analysis is unavailable (dev-mode apps created after
-// Nov 2024 may not have access to this endpoint) or the track has no such data.
-async function getStartOffsetMs(uri){
-  const id = uri.split(':')[2];
-  try{
-    const a = await api('/audio-analysis/'+id);
-    const seg = (a.segments||[]).find(s=> s.loudness_max >= SILENCE_DB);
-    if(seg) return Math.min(Math.round(seg.start*1000), MAX_SKIP_MS);
-  }catch(e){}
-  return 0;
-}
-async function playSnippet(uri, ms, offsetMs){
+async function playSnippet(uri, ms){
   const dev = await ensureDevice();
   if(!dev){ fatal("Player not ready","Couldn't create a Spotify playback device. Make sure this account is Premium."); return; }
-  await api('/me/player/play?device_id='+dev, {method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({uris:[uri], position_ms:offsetMs||0})});
+  await api('/me/player/play?device_id='+dev, {method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({uris:[uri], position_ms:0})});
   await waitForBuffered(uri);
   clearTimeout(playTimer);
   playTimer = setTimeout(async()=>{ try{ await player.pause(); }catch(e){} stopHead(); setPlaying(false); }, ms);
@@ -668,10 +654,9 @@ function loadQuestion(){
   $('guess').disabled=false; $('guessBtn').disabled=false;
   buildTicks(); renderAttempts(); setMaxTc();
   const tr=round.tracks[round.i];
-  if(!tr._offsetPromise) tr._offsetPromise = getStartOffsetMs(tr.uri);
   const playBtn=$('playBtn');
   playBtn.disabled = true; $('playLbl').textContent = 'Loading…';
-  Promise.all([ensureDevice(), tr._offsetPromise]).then(([dev])=>{
+  ensureDevice().then(dev=>{
     if(round.tracks[round.i]!==tr) return; // question moved on before this resolved
     if(!dev){ fatal("Player not ready","Couldn't create a Spotify playback device. Make sure this account is Premium."); return; }
     playBtn.disabled = false;
@@ -707,9 +692,7 @@ $('playBtn').onclick = async ()=>{
   btn.disabled = true; $('playLbl').textContent = 'Buffering…';
   const ms=SNIPPETS[Math.min(round.att,MAX_ATT-1)];
   setMaxTc();
-  if(!tr._offsetPromise) tr._offsetPromise = getStartOffsetMs(tr.uri);
-  const offsetMs = await tr._offsetPromise;
-  await playSnippet(tr.uri, ms, offsetMs);
+  await playSnippet(tr.uri, ms);
   if(round.tracks[round.i]===tr){
     btn.disabled = false;
     if(!btn.classList.contains('playing')) $('playLbl').textContent = 'Play it!';

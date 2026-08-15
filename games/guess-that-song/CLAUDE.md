@@ -76,13 +76,10 @@ different content source.
 - **Playback:** `window.onSpotifyWebPlaybackSDKReady` hook is set *before* the SDK
   `<script>`; `initPlayer()` builds `Spotify.Player` and listens for `ready`
   (captures `device_id`), `account_error` (= not Premium), etc. `ensureDevice()`
-  waits for the device. `getStartOffsetMs(uri)` calls `/audio-analysis/{id}` and
-  returns the timestamp (ms, capped at `MAX_SKIP_MS`) of the first segment whose
-  `loudness_max` clears `SILENCE_DB` — used to skip silent intros; falls back to
-  `0` if the endpoint 403s or the track has no qualifying segment. Cached per
-  track on `tr._offsetPromise`, kicked off in `loadQuestion()` so it's usually
-  resolved by the time the player clicks Play. `playSnippet(uri, ms, offsetMs)`
-  starts at `offsetMs` and pauses after `ms` via `setTimeout`. Playhead/timeline
+  waits for the device. `waitForBuffered(uri)` polls SDK playback state until the
+  track is actually buffered/audible, so the snippet timer doesn't start ticking
+  against dead air. `playSnippet(uri, ms)` starts at position 0, waits on
+  `waitForBuffered()`, then pauses after `ms` via `setTimeout`. Playhead/timeline
   animated via `requestAnimationFrame`.
 - **Matching:** `norm()` (lowercase, strip diacritics, drop `(…)`/`[…]`, `feat.`,
   remaster/live tags, punctuation) → `lev()` (Levenshtein) → `isMatch()` accepts on
@@ -130,9 +127,3 @@ hidden during guessing and revealed only at round resolution.
   `{"added_at":…, "item": {...track...}}` instead of `{"added_at":…, "track": {...}}`.
   `/me/tracks` (Liked Songs) is unaffected and still uses `"track"`. `fetchTracks()`
   handles both via `it.track||it.item||it`.
-- **`/audio-analysis/{id}` (used to skip silent intros) may 403 for this app.**
-  Spotify restricted `audio-features`/`audio-analysis` to apps that already had
-  extended-quota access before the Nov 2024 cutoff; a dev-mode app created after
-  that may not have access at all. `getStartOffsetMs()` catches this and falls
-  back to `offsetMs=0` (old behavior: play from the very start), so a 403 here is
-  silent and not a bug — don't "fix" it by chasing scopes, there's no scope for it.
