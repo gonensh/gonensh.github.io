@@ -295,7 +295,10 @@
   <!-- GAME -->
   <section id="s-game" class="hidden">
     <div class="score-top">
-      <div class="s">Song <b id="qNum">1</b> / <span id="qTot">10</span></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="ghost-btn" id="backBtn" style="padding:6px 10px;font-size:11px">‹ Playlists</button>
+        <div class="s">Song <b id="qNum">1</b> / <span id="qTot">10</span></div>
+      </div>
       <div class="s">Score <b id="scoreNow">0</b></div>
     </div>
 
@@ -764,6 +767,12 @@ $('nextBtn').onclick=()=>{
   round.i++;
   if(round.i>=round.tracks.length) showResults();
   else loadQuestion();
+};
+$('backBtn').onclick=async ()=>{
+  clearTimeout(playTimer); stopHead();
+  try{ await player.pause(); }catch(e){}
+  setPlaying(false);
+  goto('picker'); loadPlaylists();
 };
 
 /* ================= RESULTS ================= */
