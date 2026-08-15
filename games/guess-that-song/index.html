@@ -282,6 +282,7 @@
     </div>
 
     <div style="height:14px"></div>
+    <input type="text" id="plSearch" placeholder="🔍 Search your playlists…" autocomplete="off" spellcheck="false" style="margin-bottom:14px"/>
     <div id="plGrid" class="grid"></div>
     <div id="plLoading" class="center"><div class="spin"></div></div>
   </section>
@@ -538,8 +539,24 @@ $('countSeg').addEventListener('click', e=>{
   [...$('countSeg').children].forEach(x=>x.classList.remove('on')); b.classList.add('on');
   songCount = +b.dataset.n;
 });
+let plCards=[];
+function renderPlGrid(){
+  const q=$('plSearch').value.trim().toLowerCase();
+  const list = q ? plCards.filter(c=> c.name.toLowerCase().includes(q)) : plCards;
+  if(list.length===0 && plCards.length>0){
+    $('plGrid').innerHTML=`<div class="warn" style="grid-column:1/-1">No playlists match “${escapeHtml($('plSearch').value.trim())}”.</div>`;
+    return;
+  }
+  $('plGrid').innerHTML = list.map(c=>`
+    <button class="pl" data-id="${c.id}" data-name="${encodeURIComponent(c.name)}" ${c.liked?'data-liked="1"':''}>
+      ${c.img?`<img src="${c.img}" alt="">`:`<div class="ph" style="display:flex;align-items:center;justify-content:center">${c.liked?'💛':'🎵'}</div>`}
+      <div><div class="t">${escapeHtml(c.name)}</div><div class="c">${c.total} tracks</div></div>
+    </button>`).join('');
+  $('plGrid').querySelectorAll('.pl').forEach(el=> el.onclick = ()=> startGame({id:el.dataset.id, name:decodeURIComponent(el.dataset.name), liked:el.dataset.liked==='1'}));
+}
+$('plSearch').addEventListener('input', renderPlGrid);
 async function loadPlaylists(){
-  show('plLoading'); $('plGrid').innerHTML='';
+  show('plLoading'); $('plGrid').innerHTML=''; $('plSearch').value='';
   try{
     const cards=[];
     // Liked Songs pseudo-playlist
@@ -551,13 +568,9 @@ async function loadPlaylists(){
       d.items.forEach(pl=>{ if(pl) cards.push({id:pl.id, name:pl.name, total:pl.tracks?.total??'?', img:pl.images?.[0]?.url}); });
       url = d.next ? d.next.replace('https://api.spotify.com/v1','') : null;
     }
+    plCards = cards;
     hide('plLoading');
-    $('plGrid').innerHTML = cards.map(c=>`
-      <button class="pl" data-id="${c.id}" data-name="${encodeURIComponent(c.name)}" ${c.liked?'data-liked="1"':''}>
-        ${c.img?`<img src="${c.img}" alt="">`:`<div class="ph" style="display:flex;align-items:center;justify-content:center">${c.liked?'💛':'🎵'}</div>`}
-        <div><div class="t">${escapeHtml(c.name)}</div><div class="c">${c.total} tracks</div></div>
-      </button>`).join('');
-    $('plGrid').querySelectorAll('.pl').forEach(el=> el.onclick = ()=> startGame({id:el.dataset.id, name:decodeURIComponent(el.dataset.name), liked:el.dataset.liked==='1'}));
+    renderPlGrid();
   }catch(e){
     hide('plLoading');
     if(String(e.message).includes('401')||String(e.message)==='no-token') return goto('connect');
