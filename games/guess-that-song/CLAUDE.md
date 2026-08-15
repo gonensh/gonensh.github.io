@@ -80,7 +80,13 @@ different content source.
   track is actually buffered/audible, so the snippet timer doesn't start ticking
   against dead air. `playSnippet(uri, ms)` starts at position 0, waits on
   `waitForBuffered()`, then pauses after `ms` via `setTimeout`. Playhead/timeline
-  animated via `requestAnimationFrame`.
+  animated via `requestAnimationFrame`. `prefetchNext(tr)` is fired (not awaited)
+  from `loadQuestion()` for `round.tracks[i+1]`, queueing it via
+  `POST /me/player/queue` so Spotify's device has the whole guessing round to
+  buffer it ahead of time; queueing doesn't touch the currently active track, and
+  failures are swallowed since `playSnippet()` still explicitly plays + waits on
+  `waitForBuffered()` when the track is actually needed. Guarded per-track by
+  `tr._queued` so it only fires once.
 - **Matching:** `norm()` (lowercase, strip diacritics, drop `(…)`/`[…]`, `feat.`,
   remaster/live tags, punctuation) → `lev()` (Levenshtein) → `isMatch()` accepts on
   exact / containment / distance ≤ 20% of target length. **Title only.**

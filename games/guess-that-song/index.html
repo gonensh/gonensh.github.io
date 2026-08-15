@@ -513,6 +513,21 @@ async function playSnippet(uri, ms){
   playTimer = setTimeout(async()=>{ try{ await player.pause(); }catch(e){} stopHead(); setPlaying(false); }, ms);
   runHead(ms);
 }
+// Best-effort: hand Spotify's device the next track as soon as the current
+// question starts, so it has the whole guessing round to prefetch it in the
+// background. Doesn't touch active playback (queueing doesn't interrupt what's
+// already playing) and never blocks the caller — if it fails/403s, playSnippet()
+// still explicitly PUTs /play and waits on waitForBuffered() when the track is
+// actually needed, so there's no user-visible fallback path to maintain.
+async function prefetchNext(tr){
+  if(!tr || tr._queued) return;
+  tr._queued = true;
+  try{
+    const dev = await ensureDevice();
+    if(!dev) return;
+    await api('/me/player/queue?uri='+encodeURIComponent(tr.uri)+'&device_id='+dev, {method:'POST'});
+  }catch(e){}
+}
 
 /* ================= PLAYLIST PICKER ================= */
 $('countSeg').addEventListener('click', e=>{
@@ -654,6 +669,7 @@ function loadQuestion(){
   $('guess').disabled=false; $('guessBtn').disabled=false;
   buildTicks(); renderAttempts(); setMaxTc();
   const tr=round.tracks[round.i];
+  prefetchNext(round.tracks[round.i+1]);
   const playBtn=$('playBtn');
   playBtn.disabled = true; $('playLbl').textContent = 'Loading…';
   ensureDevice().then(dev=>{
