@@ -609,11 +609,20 @@ async function waitForBuffered(uri, timeoutMs=8000){
   }
   return false;
 }
-async function playSnippet(uri, ms){
+// `seq` is the playback generation from startPlayback(). Device lookup and
+// buffering both take real time on a phone, and the snippet can now be
+// (re)started by Skip / Guess / Next as well as Play — so a request that was
+// superseded, or whose song has since resolved to the reveal, must not come
+// back and start audio. Bail at every await, pausing if sound already started.
+async function playSnippet(uri, ms, seq){
+  const stale = ()=> seq!==undefined && seq!==playSeq;
   const dev = await ensureDevice();
+  if(stale()) return;
   if(!dev){ fatal("Player not ready","Couldn't create a Spotify playback device. Make sure this account is Premium."); return; }
   await api('/me/player/play?device_id='+dev, {method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({uris:[uri], position_ms:0})});
+  if(stale()){ try{ await player.pause(); }catch(e){} return; }
   await waitForBuffered(uri);
+  if(stale()){ try{ await player.pause(); }catch(e){} return; }
   clearTimeout(playTimer);
   playTimer = setTimeout(async()=>{ try{ await player.pause(); }catch(e){} stopHead(); setPlaying(false); }, ms);
   runHead(ms);
@@ -787,7 +796,7 @@ function setBarMode(mode){
   $('nextBtn').classList.toggle('hidden', guessing);
   syncBar(); // the two modes are different heights; reserve the right gap now
 }
-function loadQuestion(){
+function loadQuestion(autoplay){
   round.att=0;
   $('qNum').textContent=round.i+1; $('qTot').textContent=round.tracks.length;
   $('scoreNow').textContent=round.score;
@@ -797,14 +806,18 @@ function loadQuestion(){
   buildTicks(); renderAttempts(); setMaxTc();
   const tr=round.tracks[round.i];
   prefetchNext(round.tracks[round.i+1]);
-  const playBtn=$('playBtn');
-  playBtn.disabled = true; $('playLbl').textContent = 'Loading…';
-  ensureDevice().then(dev=>{
-    if(round.tracks[round.i]!==tr) return; // question moved on before this resolved
-    if(!dev){ fatal("Player not ready","Couldn't create a Spotify playback device. Make sure this account is Premium."); return; }
-    playBtn.disabled = false;
-    $('playLbl').textContent = 'Play it!';
-  });
+  if(autoplay){
+    startPlayback(); // waits on its own ensureDevice() inside playSnippet()
+  } else {
+    const playBtn=$('playBtn');
+    playBtn.disabled = true; $('playLbl').textContent = 'Loading…';
+    ensureDevice().then(dev=>{
+      if(round.tracks[round.i]!==tr) return; // question moved on before this resolved
+      if(!dev){ fatal("Player not ready","Couldn't create a Spotify playback device. Make sure this account is Premium."); return; }
+      playBtn.disabled = false;
+      $('playLbl').textContent = 'Play it!';
+    });
+  }
   // Auto-focus only where focus is free: on a touch device it yanks the
   // keyboard open on every song, so there the user taps the field when ready.
   if(!isTouch) $('guess').focus();
@@ -830,19 +843,28 @@ function setPlaying(on){
   $('playLbl').textContent = on ? 'Playing… 🎵' : 'Play it!';
   $('onair').parentElement && $('onair').classList.toggle('live',on);
 }
-$('playBtn').onclick = async ()=>{
+/* Single entry point for "play the current snippet". Reached from the Play
+   button and, so the round flows hands-free, automatically from Skip, a wrong
+   Guess, and Next song. Every one of those is a real tap, which matters: iOS
+   only lets the SDK unlock its audio element inside a user gesture, and
+   activateElement() below is still within that gesture's task. */
+let playSeq = 0;
+async function startPlayback(){
+  const tr = round.tracks[round.i];
+  if(!tr) return;
+  if(round.done.length > round.i) return; // song already resolved; reveal is up
+  const btn = $('playBtn');
+  const seq = ++playSeq;                  // a newer tap invalidates this one
   if(player && player.activateElement){ try{ await player.activateElement(); }catch(e){} }
-  const tr=round.tracks[round.i];
-  const btn=$('playBtn');
+  if(seq!==playSeq) return;
   btn.disabled = true; $('playLbl').textContent = 'Buffering…';
-  const ms=SNIPPETS[Math.min(round.att,MAX_ATT-1)];
   setMaxTc();
-  await playSnippet(tr.uri, ms);
-  if(round.tracks[round.i]===tr){
-    btn.disabled = false;
-    if(!btn.classList.contains('playing')) $('playLbl').textContent = 'Play it!';
-  }
-};
+  await playSnippet(tr.uri, SNIPPETS[Math.min(round.att,MAX_ATT-1)], seq);
+  if(seq!==playSeq || round.tracks[round.i]!==tr) return;
+  btn.disabled = false;
+  if(!btn.classList.contains('playing')) $('playLbl').textContent = 'Play it!';
+}
+$('playBtn').onclick = startPlayback;
 
 /* guessing */
 function submitGuess(){
@@ -858,14 +880,14 @@ function submitGuess(){
   // No re-focus: keepKeyboard() kept focus on the input through the tap, so the
   // keyboard is still up and the next guess can be typed straight away.
   if(round.att>=MAX_ATT){ endRound(false); }
-  else { renderAttempts(); setMaxTc(); }
+  else { renderAttempts(); startPlayback(); } // startPlayback() calls setMaxTc()
 }
 $('guessBtn').onclick=submitGuess;
 $('guess').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); submitGuess(); } });
 $('skipBtn').onclick=()=>{
   round.att++;
   if(round.att>=MAX_ATT){ $('feedback').textContent="Nice try! Here's the song:"; $('feedback').className='feedback bad'; endRound(false); }
-  else { $('feedback').textContent='Skipped — here\'s a bit more! 🎧'; $('feedback').className='feedback'; renderAttempts(); setMaxTc(); }
+  else { $('feedback').textContent='Skipped — here\'s a bit more! 🎧'; $('feedback').className='feedback'; renderAttempts(); startPlayback(); }
 };
 function win(){
   const pts=POINTS[round.att];
@@ -877,6 +899,7 @@ function win(){
   endRound(true, pts);
 }
 async function endRound(solved, pts=0){
+  playSeq++; // kill any in-flight snippet so it can't start audio over the reveal
   clearTimeout(playTimer); stopHead(); try{ await player.pause(); }catch(e){} setPlaying(false);
   const tr=round.tracks[round.i];
   round.done.push({ tr, solved, pts: solved?pts:0, att: round.att });
@@ -898,9 +921,10 @@ async function endRound(solved, pts=0){
 $('nextBtn').onclick=()=>{
   round.i++;
   if(round.i>=round.tracks.length) showResults();
-  else loadQuestion();
+  else loadQuestion(true);
 };
 $('backBtn').onclick=async ()=>{
+  playSeq++; // leaving the round — don't let a pending snippet resume audio
   clearTimeout(playTimer); stopHead();
   try{ await player.pause(); }catch(e){}
   setPlaying(false);

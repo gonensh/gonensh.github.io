@@ -57,6 +57,11 @@ different content source.
 - **Guessing:** type to guess; fuzzy match on the **song title only** (artist does
   not count).
 - **Snippet grows per guess:** `1 / 2 / 4 / 7 / 11 / 16` seconds — 6 attempts total.
+- **Autoplay:** only the *first* song of a round waits for an explicit **Play it!**
+  (that tap is also what unlocks the SDK's audio element on iOS). After that the
+  round is hands-free — **Skip**, a **wrong Guess**, and **Next song** each start
+  the new snippet themselves. Play stays available for a replay. Resolutions
+  (correct guess, attempts exhausted, last song) never autoplay.
 - **Scoring:** solving at attempt 1→6 earns `6 / 5 / 4 / 3 / 2 / 1` points; a miss = 0.
 - **Reveal:** on a correct guess **or** once all guesses are used, playback pauses and
   the app shows **cover art + title + artist + album**.
@@ -78,9 +83,17 @@ different content source.
   (captures `device_id`), `account_error` (= not Premium), etc. `ensureDevice()`
   waits for the device. `waitForBuffered(uri)` polls SDK playback state until the
   track is actually buffered/audible, so the snippet timer doesn't start ticking
-  against dead air. `playSnippet(uri, ms)` starts at position 0, waits on
+  against dead air. `playSnippet(uri, ms, seq)` starts at position 0, waits on
   `waitForBuffered()`, then pauses after `ms` via `setTimeout`. Playhead/timeline
-  animated via `requestAnimationFrame`. `prefetchNext(tr)` is fired (not awaited)
+  animated via `requestAnimationFrame`.
+  **`startPlayback()` is the single entry point** for "play the current snippet" —
+  Play, Skip, wrong Guess and Next song all go through it. It stamps a monotonic
+  `playSeq` generation, which `playSnippet()` re-checks after *every* await
+  (`ensureDevice`, the `PUT /play`, `waitForBuffered`) and bails from — pausing if
+  audio already started. `endRound()` and the back-to-picker button bump `playSeq`
+  too. Without this a snippet still buffering when the song resolves would come
+  back and play over the reveal; on a phone that window is seconds wide.
+  `prefetchNext(tr)` is fired (not awaited)
   from `loadQuestion()` for `round.tracks[i+1]`, queueing it via
   `POST /me/player/queue` so Spotify's device has the whole guessing round to
   buffer it ahead of time; queueing doesn't touch the currently active track, and
