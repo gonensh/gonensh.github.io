@@ -263,6 +263,9 @@
     .pcap,.plabel{display:none}
     /* Reserve the ribbon's height too, so it never lands on the reveal card. */
     body.on-game #s-game{padding-bottom:calc(var(--barh,150px) + 66px)}
+    /* On results there's no bar under the ribbon — it floats over the score list,
+       so the list needs room to scroll clear of it. */
+    #s-results{padding-bottom:70px}
     /* While typing there's no room to spare, and the piles aren't what you're
        looking at — let the keyboard have the screen. */
     body.kb-open .piles{display:none}
