@@ -202,6 +202,11 @@
     min-height:42px;padding:9px 12px;cursor:pointer}
   .skip:hover{color:var(--cream);border-color:var(--faint)}
   .skip:active{transform:translateY(1px)}
+  /* Final attempt: this no longer skips ahead, it forfeits the song.
+     NB: not `.reveal` — that class is already the album-art block below, and
+     its display:flex would knock this label out of centre. */
+  .skip.giveup{background:var(--coral-soft);border-color:rgba(255,111,97,.45);color:#9c2e22}
+  .skip.giveup:hover{color:#9c2e22;border-color:var(--coral)}
 
   /* Reveal */
   .reveal{display:flex;gap:14px;align-items:center;margin-top:4px}
@@ -771,7 +776,18 @@ function buildTicks(){
     el.innerHTML='<span></span>'+s; ticks.appendChild(el);
   });
 }
+/* On the final attempt the snippet is already at its full 16s, so there is
+   nothing left to unlock — the button gives up rather than skipping ahead.
+   Say so, since tapping it costs the song. Driven from renderAttempts() so it
+   can't drift out of sync with round.att. */
+function renderSkip(){
+  const last = round.att >= MAX_ATT-1;
+  const b = $('skipBtn');
+  b.textContent = last ? 'Give up, reveal it 👀 ›' : 'Skip, hear more 🎧 ›';
+  b.classList.toggle('giveup', last);
+}
 function renderAttempts(){
+  renderSkip();
   const box=$('attempts'); box.innerHTML='';
   for(let k=0;k<MAX_ATT;k++){
     const d=document.createElement('div'); d.className='att';

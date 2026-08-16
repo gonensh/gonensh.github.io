@@ -65,6 +65,11 @@ different content source.
 - **Scoring:** solving at attempt 1→6 earns `6 / 5 / 4 / 3 / 2 / 1` points; a miss = 0.
 - **Reveal:** on a correct guess **or** once all guesses are used, playback pauses and
   the app shows **cover art + title + artist + album**.
+- **Skip relabels on the last attempt:** at attempt 6 the snippet is already the
+  full 16s, so there is nothing left to unlock and the button forfeits the song
+  instead. `renderSkip()` (called from `renderAttempts()`) swaps it to *"Give up,
+  reveal it"* with a coral `.giveup` treatment. Behaviour is unchanged — it was
+  always `att++ → endRound(false)` — only the label was lying.
 - **Sources:** the user's playlists, a pasted playlist link/URI, or Liked Songs.
 - **Round length:** 5 / 10 / 15 songs (default 10).
 
