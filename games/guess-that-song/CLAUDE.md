@@ -133,6 +133,17 @@ different content source.
     only thing that lands the card. For the same reason nothing but `transform`
     is transitioned: a frozen `bottom`/`left` transition strands the card at a
     stale value that no longer tracks `--barh`.
+  - **Tapping a pile opens `#pmodal`**, a scrollable list of everything on it —
+    `openPileModal(solved)` filters `round.done` (the same array `showResults()`
+    reads) rather than re-deriving from the DOM, so it can never disagree with
+    the results screen, and it's never stale even for a card whose flight hasn't
+    landed: `round.done` is written synchronously in `endRound()`, ahead of the
+    deferred pile-drop. Rows reuse `.ri`, the results-list row markup. `.piles`
+    is `pointer-events:none` so the flanks never steal board taps; `.pile.has`
+    flips it back to `auto`, which every `.pcard`/`.plabel` inherits, making the
+    whole mound tappable — an empty pile (no `.has`) stays inert. Closes via the
+    × button, a backdrop tap, Escape, or — unconditionally — the next `goto()`
+    call, so it can never survive under a screen it doesn't belong to.
 - **Matching:** `norm()` (lowercase, strip diacritics, drop `(…)`/`[…]`, `feat.`,
   remaster/live tags, punctuation) → `lev()` (Levenshtein) → `isMatch()` accepts on
   exact / containment / distance ≤ 20% of target length. **Title only.**

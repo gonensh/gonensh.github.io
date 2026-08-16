@@ -230,6 +230,11 @@
   .pile.has .plabel{opacity:1}
   .plabel b{color:var(--amber-dim)}
   .pile.miss .plabel b{color:var(--coral)}
+  /* .piles is pointer-events:none so the flanks never steal taps from the
+     board; .has flips it back to auto, which every pcard/plabel inherits
+     (they don't set their own), making the whole mound tappable — an empty
+     pile stays inert since there's nothing to open. */
+  .pile.has{pointer-events:auto;cursor:pointer}
 
   .pcard{position:absolute;left:0;bottom:calc(var(--i) * var(--off));margin-left:var(--jx);
     width:var(--cw);background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:4px;
@@ -276,6 +281,39 @@
   @media (max-height:430px){ .piles{display:none !important} }
   @media (prefers-reduced-motion:reduce){
     .pcard{transition:none} .pile.thud{animation:none}
+    .pmodal-card{animation:none}
+  }
+
+  /* Pile modal — opened by tapping a stack; lists every card on it. A bottom
+     sheet on phones (matches the ribbon it's opened from), a centered dialog
+     once there's room. Independent of .piles.on — goto() closes it on every
+     screen change, so it can never survive under a screen it doesn't belong to. */
+  .pmodal{position:fixed;inset:0;z-index:300;display:none;
+    align-items:flex-end;justify-content:center;background:rgba(20,28,46,.46)}
+  .pmodal.on{display:flex}
+  body.pmodal-open{overflow:hidden}
+  .pmodal-card{width:100%;max-width:560px;max-height:min(78vh,640px);
+    background:var(--panel);border-radius:22px 22px 0 0;box-shadow:0 -12px 40px rgba(31,46,77,.28);
+    display:flex;flex-direction:column;overflow:hidden;
+    animation:pmodalIn .26s cubic-bezier(.22,1.06,.36,1)}
+  @keyframes pmodalIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .pmodal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:none;
+    padding:16px 12px 14px 20px;border-bottom:1px solid var(--line)}
+  .pmodal-title{font-family:var(--disp);font-weight:700;font-size:16px;color:var(--cream)}
+  .pmodal-title b{color:var(--amber-dim)}
+  .pmodal.miss .pmodal-title b{color:var(--coral)}
+  .pmodal-x{width:40px;height:40px;min-width:40px;border-radius:50%;border:none;flex:none;
+    background:var(--panel-2);color:var(--muted);font-size:16px;font-weight:700;line-height:1;
+    display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .pmodal-x:hover{background:var(--line);color:var(--cream)}
+  .pmodal-x:active{transform:scale(.94)}
+  .pmodal-list{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1 1 auto;
+    padding:10px 14px calc(14px + env(safe-area-inset-bottom));
+    display:flex;flex-direction:column;gap:8px}
+  .pmodal-list .ri{background:var(--panel-2)} /* modal card is already --panel; keep rows visibly separate */
+  @media (min-width:601px){
+    .pmodal{align-items:center;padding:24px}
+    .pmodal-card{border-radius:22px;max-height:min(72vh,600px)}
   }
 
   .score-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
@@ -476,6 +514,17 @@
     <div class="pile miss" id="pileMiss"><div class="plabel" id="lblMiss"></div></div>
   </div>
 
+  <!-- Tapping a pile opens this: the full list of what's on it -->
+  <div class="pmodal" id="pmodal">
+    <div class="pmodal-card" role="dialog" aria-modal="true" aria-labelledby="pmodalTitle">
+      <div class="pmodal-head">
+        <div class="pmodal-title" id="pmodalTitle"></div>
+        <button class="pmodal-x" id="pmodalClose" aria-label="Close">✕</button>
+      </div>
+      <div class="pmodal-list" id="pmodalList"></div>
+    </div>
+  </div>
+
   <footer>
     Private hobby build · plays only from your own Spotify Premium account<br>
     Not affiliated with Spotify · development-mode use only
@@ -519,6 +568,7 @@ const hide = id => $(id).classList.add('hidden');
 const screens = ['s-setup','s-connect','s-picker','s-loading','s-game','s-results'];
 let syncBar = ()=>{}; // assigned by trackViewport() below
 function goto(name){
+  closePileModal(); // never let it survive under a screen it doesn't belong to
   screens.forEach(s=> s===('s-'+name)?show(s):hide(s));
   const inGame = name==='game';
   document.body.classList.toggle('on-game', inGame);
@@ -921,6 +971,40 @@ function pileAdd(tr, solved){
   card.addEventListener('transitionend', onEnd);
   setTimeout(land, 900);
 }
+
+/* Tapping a pile opens the full list of what's on it. round.done is the single
+   source of truth — it already carries the full track plus solved/pts/att, and
+   it's written synchronously in endRound() the moment a song resolves, ahead of
+   the (deferred) pile-drop animation — so the modal is never stale, even for a
+   card whose flight hasn't landed yet. Reuses .ri, the same row markup as the
+   results screen, so a pile and the results list read as the same list. */
+function openPileModal(solved){
+  const rows = round.done.filter(d=>d.solved===solved);
+  if(!rows.length) return;
+  const modal=$('pmodal');
+  modal.classList.toggle('miss', !solved);
+  $('pmodalTitle').innerHTML = (solved?'Nailed':'Missed')+' <b>'+rows.length+'</b>';
+  $('pmodalList').innerHTML = rows.map(d=>`
+    <div class="ri">
+      ${d.tr.img?`<img src="${d.tr.img}" alt="">`:`<div class="ph"></div>`}
+      <div class="rt"><b>${escapeHtml(d.tr.name)}</b><small>${escapeHtml(d.tr.artists.map(a=>a.name).join(', '))}</small></div>
+      <div class="pts ${d.solved?'p':'z'}">${d.solved?'+'+d.pts:'—'}</div>
+    </div>`).join('');
+  modal.classList.add('on');
+  document.body.classList.add('pmodal-open');
+  $('pmodalClose').focus({preventScroll:true});
+}
+function closePileModal(){
+  $('pmodal').classList.remove('on');
+  document.body.classList.remove('pmodal-open');
+}
+$('piles').addEventListener('click', e=>{
+  const pile = e.target.closest('.pile');
+  if(pile && pile.classList.contains('has')) openPileModal(pile.id==='pileGot');
+});
+$('pmodalClose').onclick = closePileModal;
+$('pmodal').addEventListener('click', e=>{ if(e.target===$('pmodal')) closePileModal(); }); // backdrop tap
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && $('pmodal').classList.contains('on')) closePileModal(); });
 
 /* ================= GAME LOOP ================= */
 function buildTicks(){
