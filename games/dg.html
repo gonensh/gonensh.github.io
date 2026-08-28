@@ -1495,6 +1495,7 @@ const KEYMAP = {
 };
 addEventListener('keydown', e => {
   if(e.code === 'KeyM') toggleSound();
+  document.getElementById('pad').classList.remove('on');
   // On the "press to continue" screens, ANY key advances — not just Space/W/Up.
   // A TV remote's OK/select button rarely maps to something in KEYMAP, so
   // requiring an exact match here would leave remote-only users stuck.
@@ -1552,6 +1553,8 @@ bindTouch(document.getElementById('bJ'), 'jump');
 if('ontouchstart' in window || navigator.maxTouchPoints > 0){
   document.getElementById('pad').classList.add('on');
 }
+// A touch after the keyboard hid the pad means the player switched back to touch.
+addEventListener('touchstart', () => document.getElementById('pad').classList.add('on'), {passive:true});
 // tapping the canvas also starts / jumps
 cv.addEventListener('pointerdown', () => {
   audio();
