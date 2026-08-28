@@ -1501,10 +1501,11 @@ addEventListener('keydown', e => {
   if(!controllerMode && (state === 'title' || state === 'gameover' || state === 'victory')){
     e.preventDefault(); audio();
     localInput.jump = true; setTimeout(() => localInput.jump = false, 80);
+    pad.classList.remove('on');
     return;
   }
   const k = KEYMAP[e.code];
-  if(k){ e.preventDefault(); localInput[k] = true; keys[e.code] = true; audio(); }
+  if(k){ e.preventDefault(); localInput[k] = true; keys[e.code] = true; audio(); pad.classList.remove('on'); }
 });
 addEventListener('keyup', e => {
   const k = KEYMAP[e.code];
@@ -1549,8 +1550,10 @@ bindTouch(document.getElementById('bL'), 'left');
 bindTouch(document.getElementById('bR'), 'right');
 bindTouch(document.getElementById('bJ'), 'jump');
 
-if('ontouchstart' in window || navigator.maxTouchPoints > 0){
-  document.getElementById('pad').classList.add('on');
+const pad = document.getElementById('pad');
+const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+if(isTouchDevice){
+  pad.classList.add('on');
 }
 // tapping the canvas also starts / jumps
 cv.addEventListener('pointerdown', () => {
@@ -1559,6 +1562,10 @@ cv.addEventListener('pointerdown', () => {
     localInput.jump = true; setTimeout(() => localInput.jump = false, 80);
   }
 });
+// a touch after keyboard play brings the on-screen controls back
+addEventListener('touchstart', () => {
+  if(isTouchDevice) pad.classList.add('on');
+}, {passive:true});
 
 const soundBtn = document.getElementById('sound');
 function toggleSound(){
