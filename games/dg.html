@@ -1534,7 +1534,7 @@ function drawEnemies(){
       ctx.globalAlpha = Math.max(0, 1 - e.dead/26);
       ctx.translate(x + e.w/2, e.y + e.h);
       ctx.scale(1 + e.dead*0.02, Math.max(0.12, 1 - e.dead*0.05));
-      const deadColor = e.type === 'fly' ? '#ff9d4d' : e.type === 'iceking' ? '#bfe9ff' : '#a06bff';
+      const deadColor = e.type === 'fly' ? '#ff9d4d' : e.type === 'iceking' ? '#c68a52' : '#a06bff';
       fillRR(-e.w/2, -e.h, e.w, e.h, 12, deadColor, '#2b1a45');
       ctx.restore();
       continue;
@@ -1542,6 +1542,9 @@ function drawEnemies(){
     if(e.type === 'iceking'){
       const flash = e.hitFlash > 0;
       const bodyCol = flash ? '#ffffff' : '#cdeeff';
+      const skin = '#f0b98a';
+      const fur = flash ? '#ffffff' : '#c68a52';
+      const furDk = '#8a5c30';
       ctx.save();
       ctx.translate(x + e.w/2, e.y + e.h);
       ctx.scale(e.face, 1);
@@ -1549,33 +1552,42 @@ function drawEnemies(){
       ctx.globalAlpha = 0.2; ctx.fillStyle = '#000';
       ctx.beginPath(); ctx.ellipse(0, 2, e.w*0.42, 6, 0, 0, 7); ctx.fill();
       ctx.globalAlpha = 1;
-      // icy robe
+      // icy robe (a human body, not a monster)
       fillRR(-e.w/2, -e.h*0.78, e.w, e.h*0.78, 16, bodyCol, '#1c3a52');
-      // ice-crown spikes on the shoulders
-      ctx.fillStyle = '#eaffff'; ctx.strokeStyle = '#1c3a52'; ctx.lineWidth = 2;
-      for(let i=-1;i<=1;i++){
-        ctx.beginPath();
-        ctx.moveTo(i*18-7, -e.h*0.78); ctx.lineTo(i*18, -e.h*0.78-18); ctx.lineTo(i*18+7, -e.h*0.78);
-        ctx.closePath(); ctx.fill(); ctx.stroke();
-      }
-      // arms
+      // fur-trimmed collar, matching the bear head
+      ctx.fillStyle = fur; ctx.strokeStyle = furDk; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.ellipse(0, -e.h*0.78, e.w*0.46, 8, 0, 0, 7); ctx.fill(); ctx.stroke();
+      // arms with human hands
       fillRR(-e.w/2-10, -e.h*0.66, 12, e.h*0.4, 6, bodyCol, '#1c3a52');
       fillRR(e.w/2-2, -e.h*0.66, 12, e.h*0.4, 6, bodyCol, '#1c3a52');
-      // bear head
-      ctx.fillStyle = '#f2f8ff'; ctx.strokeStyle = '#1c3a52'; ctx.lineWidth = 3;
+      ctx.fillStyle = skin; ctx.strokeStyle = '#1c3a52'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(-e.w/2-4, -e.h*0.26, 6, 0, 7); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.arc(e.w/2+4, -e.h*0.26, 6, 0, 7); ctx.fill(); ctx.stroke();
+      // a light brown bear head
+      ctx.fillStyle = fur; ctx.strokeStyle = furDk; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.arc(0, -e.h*0.92, 22, 0, 7); ctx.fill(); ctx.stroke();
       // ears
       ctx.beginPath(); ctx.arc(-16, -e.h*0.92-16, 8, 0, 7); ctx.arc(16, -e.h*0.92-16, 8, 0, 7); ctx.fill(); ctx.stroke();
       // snout
-      ctx.fillStyle = '#dceeff';
+      ctx.fillStyle = '#e8c9a0';
       ctx.beginPath(); ctx.ellipse(5, -e.h*0.85, 11, 8, 0, 0, 7); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = '#1c3a52';
+      ctx.fillStyle = furDk;
       ctx.beginPath(); ctx.arc(11, -e.h*0.87, 2.4, 0, 7); ctx.fill();
       // eyes
       ctx.beginPath(); ctx.arc(-6, -e.h*0.98, 2.6, 0, 7); ctx.arc(5, -e.h*1.0, 2.6, 0, 7); ctx.fill();
       // teeth
       ctx.fillStyle = '#ffffff';
       ctx.beginPath(); ctx.moveTo(0,-e.h*0.81); ctx.lineTo(4,-e.h*0.81); ctx.lineTo(2,-e.h*0.77); ctx.closePath(); ctx.fill();
+      // a golden crown resting on the head
+      const headTop = -e.h*0.92 - 22;
+      ctx.fillStyle = '#ffd23f'; ctx.strokeStyle = '#a5772a'; ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-14, headTop+6); ctx.lineTo(-14, headTop-4);
+      ctx.lineTo(-7, headTop+2); ctx.lineTo(0, headTop-10); ctx.lineTo(7, headTop+2);
+      ctx.lineTo(14, headTop-4); ctx.lineTo(14, headTop+6);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#ff5fa2';
+      ctx.beginPath(); ctx.arc(0, headTop-2, 2.6, 0, 7); ctx.fill();
       ctx.restore();
       continue;
     }
