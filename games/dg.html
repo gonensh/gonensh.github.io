@@ -21,7 +21,7 @@
     font-family:'Fredoka','Baloo 2','Trebuchet MS',system-ui,sans-serif;
     overflow:hidden;touch-action:none;user-select:none;
   }
-  #wrap{position:relative;width:100%;max-width:1000px;padding:8px}
+  #wrap{position:relative;width:100%;padding:8px}
   canvas{
     display:block;width:100%;height:auto;
     border-radius:18px;
@@ -55,15 +55,12 @@
     background:rgba(255,255,255,.5);font-size:20px;line-height:1;cursor:pointer;
     display:flex;align-items:center;justify-content:center;
   }
-  #footerLink{
-    margin-top:10px;text-align:center;color:rgba(255,255,255,.5);
-    font-family:'Fredoka',sans-serif;font-size:13px;
-  }
-  #footerLink button{
-    background:none;border:none;color:#ffd23f;text-decoration:underline;
-    font-family:inherit;font-size:inherit;cursor:pointer;padding:4px;
-  }
   .hidden{display:none !important}
+  #verTag{
+    position:fixed;bottom:6px;right:10px;z-index:5;pointer-events:none;
+    color:rgba(255,255,255,.55);font-family:'Fredoka',sans-serif;font-size:11px;
+    text-shadow:0 1px 2px rgba(0,0,0,.6);
+  }
   #linkModal, #ctlOverlay{
     position:fixed;inset:0;z-index:50;
     display:flex;align-items:center;justify-content:center;
@@ -136,7 +133,7 @@
 <body>
 <div id="wrap">
   <canvas id="game" width="800" height="520"></canvas>
-  <div id="pad" class="on">
+  <div id="pad">
     <button class="btn" id="bL" aria-label="Move left">◀</button>
     <button class="btn" id="bR" aria-label="Move right">▶</button>
     <button class="btn" id="bJ" aria-label="Jump">JUMP</button>
@@ -144,9 +141,7 @@
   <button id="sound" aria-label="Toggle sound">🔊</button>
   <button id="linkBtn" aria-label="Play with a phone controller">📱</button>
 </div>
-<div id="footerLink">
-  <button id="ctlModeBtn" type="button">📱 Use this device as a controller instead</button>
-</div>
+<div id="verTag"></div>
 
 <div id="linkModal" class="hidden">
   <div class="card">
@@ -217,8 +212,13 @@ Minimum version required to store current data is: `+i+`.
    are original and drawn/synthesized in code.
    ============================================================ */
 
+const VERSION = 1;   // bump this by 1 on every change to this file
+const verTagEl = document.getElementById('verTag');
+if(verTagEl) verTagEl.textContent = 'v' + VERSION;
+
 const cv = document.getElementById('game');
 const ctx = cv.getContext('2d');
+const padEl = document.getElementById('pad');
 const TILE = 40, COLS = 20, ROWS = 13;
 const VW = COLS * TILE;        // 800
 const VH = ROWS * TILE;        // 520
@@ -227,6 +227,7 @@ const VH = ROWS * TILE;        // 520
 const GRAV = 0.58, MAXFALL = 15;
 const ACC = 0.55, FRIC = 0.42;
 const RUN_S = 4.6, RUN_B = 5.15;
+const RUN_MULT = 1.6;   // speed multiplier while the run key (Shift) is held
 const JUMP_V = -14.5, JUMP_CUT = 0.42;
 const STOMP_V = -10;
 const COYOTE = 8, BUFFER = 8;
@@ -484,9 +485,9 @@ const player = {
 };
 
 const keys = {};
-const localInput = { left:false, right:false, jump:false };
-const remoteInput = { left:false, right:false, jump:false };
-const input = { left:false, right:false, jump:false, jumpPrev:false };
+const localInput = { left:false, right:false, jump:false, run:false };
+const remoteInput = { left:false, right:false, jump:false, run:false };
+const input = { left:false, right:false, jump:false, run:false, jumpPrev:false };
 
 /* ============================================================
    LEVEL LOADING
@@ -506,6 +507,11 @@ function loadLevel(i, keepStars){
   level.flagDown = 0;
   resetPlayer(true);
   cam = clampCam(player.x - VW/2);
+}
+
+// Jump straight into a level from the title screen's level selector.
+function startAtLevel(i){
+  audio(); totalStars = 0; hearts = 3; loadLevel(i); state = 'play'; musicOn();
 }
 
 function resetPlayer(full){
@@ -612,6 +618,7 @@ function update(){
   input.left = localInput.left || remoteInput.left;
   input.right = localInput.right || remoteInput.right;
   input.jump = localInput.jump || remoteInput.jump;
+  input.run = localInput.run || remoteInput.run;
   tick++;
   if(shake > 0) shake--;
 
@@ -677,9 +684,11 @@ function updatePlayer(){
   if(p.standing){ p.x += p.standing.dx; p.y += p.standing.dy; }
   p.standing = null;
 
-  const maxRun = p.big ? RUN_B : RUN_S;
-  if(input.left && !input.right){ p.vx -= ACC; p.face = -1; }
-  else if(input.right && !input.left){ p.vx += ACC; p.face = 1; }
+  const runMult = input.run ? RUN_MULT : 1;
+  const maxRun = (p.big ? RUN_B : RUN_S) * runMult;
+  const acc = ACC * runMult;
+  if(input.left && !input.right){ p.vx -= acc; p.face = -1; }
+  else if(input.right && !input.left){ p.vx += acc; p.face = 1; }
   else {
     if(p.vx > FRIC) p.vx -= FRIC;
     else if(p.vx < -FRIC) p.vx += FRIC;
@@ -1369,8 +1378,8 @@ function drawHUD(){
   starPath(140, 36, 11, 5, tick*0.02);
   ctx.fillStyle = '#ffd23f'; ctx.fill();
   text('×' + stars, 156, 37, 22, '#ffffff', 'left');
-  text('LEVEL ' + (li+1), VW-24, 30, 19, '#ffffff', 'right', '#2b1a45');
-  text(level.name, VW-24, 52, 15, '#ffe9a8', 'right', '#2b1a45');
+  text('LEVEL ' + (li+1), VW/2, 30, 19, '#ffffff', 'center', '#2b1a45');
+  text(level.name, VW/2, 52, 15, '#ffe9a8', 'center', '#2b1a45');
   if(typeof Host !== 'undefined' && Host.connected){
     fillRR(VW-118, 66, 104, 26, 12, 'rgba(75,227,160,.88)');
     text('📱 linked', VW-66, 79, 13, '#0c3b28', 'center');
@@ -1385,6 +1394,13 @@ function drawBanner(title, sub, color){
   text(sub, VW/2, y+52, 22, '#ffffff', 'center', '#2b1a45');
 }
 
+function levelButtonRects(){
+  const w = 70, h = 28, gap = 14, cx = 250;
+  const totalW = LEVELS.length*w + (LEVELS.length-1)*gap;
+  const startX = cx - totalW/2, y = 480;
+  return LEVELS.map((lv,i) => ({ x: startX + i*(w+gap), y, w, h, i }));
+}
+
 function drawTitle(){
   drawParallaxTitle();
   const leftX = 250;
@@ -1394,8 +1410,14 @@ function drawTitle(){
   drawDanny(leftX - 22, 300, 40, 54, 1, 'idle', tick);
   const blink = Math.sin(tick*0.09) > -0.3;
   if(blink) text('Press any button or tap to start', leftX, 388, 20, '#ffffff', 'center', '#2b1a45');
-  text('← → to move   •   ↑ to jump', leftX, 424, 15, '#ffffff', 'center', '#2b1a45');
+  text('← → to move   •   ↑ to jump', leftX, 408, 15, '#ffffff', 'center', '#2b1a45');
+  text('hold SHIFT to run faster', leftX, 428, 13.5, '#ffe9a8', 'center', '#2b1a45');
   text('bounce on enemies to defeat them!', leftX, 448, 13.5, '#ffe9a8', 'center', '#2b1a45');
+  text('or pick a level:', leftX, 468, 13, '#ffffff', 'center', '#2b1a45');
+  levelButtonRects().forEach(b => {
+    fillRR(b.x, b.y, b.w, b.h, 10, 'rgba(255,255,255,.3)', '#2b1a45');
+    text(String(b.i+1), b.x + b.w/2, b.y + b.h/2 + 1, 17, '#ffffff', 'center', '#2b1a45');
+  });
   drawPhonePanel();
 }
 
@@ -1491,11 +1513,16 @@ function drawVictory(){
 const KEYMAP = {
   ArrowLeft:'left', KeyA:'left',
   ArrowRight:'right', KeyD:'right',
-  ArrowUp:'jump', KeyW:'jump', Space:'jump', KeyZ:'jump', AltLeft:'jump', AltRight:'jump'
+  ArrowUp:'jump', KeyW:'jump', Space:'jump', KeyZ:'jump', AltLeft:'jump', AltRight:'jump',
+  ShiftLeft:'run', ShiftRight:'run'
 };
 addEventListener('keydown', e => {
   if(e.code === 'KeyM') toggleSound();
-  document.getElementById('pad').classList.remove('on');
+  padWanted = false;
+  if(!controllerMode && state === 'title' && /^Digit[1-9]$/.test(e.code)){
+    const idx = Number(e.code.slice(5)) - 1;
+    if(idx < LEVELS.length){ e.preventDefault(); startAtLevel(idx); return; }
+  }
   // On the "press to continue" screens, ANY key advances — not just Space/W/Up.
   // A TV remote's OK/select button rarely maps to something in KEYMAP, so
   // requiring an exact match here would leave remote-only users stuck.
@@ -1550,14 +1577,25 @@ bindTouch(document.getElementById('bL'), 'left');
 bindTouch(document.getElementById('bR'), 'right');
 bindTouch(document.getElementById('bJ'), 'jump');
 
-if('ontouchstart' in window || navigator.maxTouchPoints > 0){
-  document.getElementById('pad').classList.add('on');
+// The pad is only useful during actual gameplay — keep it off the title/help
+// screen so it can't cover the level selector, and only show it at all for
+// touch input (a keypress means the player switched to keyboard, a touch
+// means they switched back).
+let padWanted = ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+addEventListener('touchstart', () => { padWanted = true; }, {passive:true});
+function syncPad(){ padEl.classList.toggle('on', padWanted && state === 'play'); }
+function canvasPoint(e){
+  const r = cv.getBoundingClientRect();
+  return { x: (e.clientX - r.left) * (VW / r.width), y: (e.clientY - r.top) * (VH / r.height) };
 }
-// A touch after the keyboard hid the pad means the player switched back to touch.
-addEventListener('touchstart', () => document.getElementById('pad').classList.add('on'), {passive:true});
 // tapping the canvas also starts / jumps
-cv.addEventListener('pointerdown', () => {
+cv.addEventListener('pointerdown', e => {
   audio();
+  if(state === 'title'){
+    const pt = canvasPoint(e);
+    const hit = levelButtonRects().find(b => pt.x>=b.x && pt.x<=b.x+b.w && pt.y>=b.y && pt.y<=b.y+b.h);
+    if(hit){ startAtLevel(hit.i); return; }
+  }
   if(state === 'title' || state === 'gameover' || state === 'victory'){
     localInput.jump = true; setTimeout(() => localInput.jump = false, 80);
   }
@@ -1714,9 +1752,7 @@ const ctlPad = document.getElementById('ctlPad');
 const ctlCodeInput = document.getElementById('ctlCodeInput');
 const ctlConnectBtn = document.getElementById('ctlConnectBtn');
 const ctlBack = document.getElementById('ctlBack');
-const ctlModeBtn = document.getElementById('ctlModeBtn');
 const wrapEl = document.getElementById('wrap');
-const footerLinkEl = document.getElementById('footerLink');
 
 function setCtlStatus(msg){ if(ctlStatusEl) ctlStatusEl.textContent = msg; }
 
@@ -1796,7 +1832,6 @@ bindTap(ctlConnectBtn, () => Controller.connect(ctlCodeInput.value));
 function enterControllerMode(prefillCode){
   controllerMode = true;
   if(wrapEl) wrapEl.classList.add('hidden');
-  if(footerLinkEl) footerLinkEl.classList.add('hidden');
   if(ctlOverlay) ctlOverlay.classList.remove('hidden');
   if(prefillCode){
     Controller.connect(prefillCode);
@@ -1811,11 +1846,9 @@ function exitControllerMode(){
   Controller.teardown();
   if(ctlOverlay) ctlOverlay.classList.add('hidden');
   if(wrapEl) wrapEl.classList.remove('hidden');
-  if(footerLinkEl) footerLinkEl.classList.remove('hidden');
   if(history.replaceState) history.replaceState(null, '', location.pathname);
 }
 bindTap(ctlBack, exitControllerMode);
-bindTap(ctlModeBtn, () => enterControllerMode(''));
 
 /* ============================================================
    MAIN LOOP
@@ -1833,6 +1866,7 @@ function frame(now){
     while(acc >= 16.6667 && steps < 5){ update(); acc -= 16.6667; steps++; }
     if(steps === 5) acc = 0;
     render();
+    syncPad();
   } else {
     last = now;
   }
