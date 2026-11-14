@@ -69,7 +69,6 @@ if [ "${VOLCANO_NO_DEPS:-0}" != "1" ]; then
   if command -v apt-get >/dev/null 2>&1; then
     need=""
     python3 -c "import pygame" >/dev/null 2>&1 || need="$need python3-pygame"
-    command -v espeak-ng >/dev/null 2>&1 || command -v espeak >/dev/null 2>&1 || need="$need espeak-ng"
     command -v pw-play >/dev/null 2>&1 || command -v paplay >/dev/null 2>&1 || \
       command -v aplay >/dev/null 2>&1 || need="$need alsa-utils"
     if [ -n "$need" ]; then

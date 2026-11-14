@@ -23,7 +23,7 @@ This:
 - puts the game in `~/.local/share/volcano` and adds a `volcano` command
 - adds **Volcano Adventure** to the desktop menu (under Games)
 - on Raspberry Pi OS / Debian, installs `python3-pygame` (graphics),
-  `espeak-ng` (speech) and `alsa-utils` (sound for the terminal version),
+  and `alsa-utils` (sound for the terminal version),
   asking for your password if needed
 
 Put `VOLCANO_NO_DEPS=1 ` before `sh` to skip installing packages.
@@ -63,16 +63,24 @@ of Raspberry Pi OS Lite (no desktop needed). If there's no screen it can use
 `--autoplay`. The window must be at least 80×24. If the locale isn't UTF-8,
 it switches to `--ascii` by itself.
 
-## Sound and speech
+## Sound and voice
 
-Both are optional; without them the game is silent with text callouts.
-Speech uses `espeak-ng`, `espeak` or `spd-say`. The graphics version plays
-music and effects itself; the terminal version uses `pw-play`, `paplay` or
-`aplay`.
+The guide's voice is pre-recorded with **Kokoro**, a natural-sounding neural
+voice (Apache-2.0), and shipped as 215 short clips in `voice/`. The game just
+plays them back, so it sounds the same on a Pi Zero 2 W as on a fast PC and
+uses almost no CPU. If a clip is ever missing, it falls back to `espeak-ng`,
+`espeak` or `spd-say` when one is installed.
+
+The graphics version plays music, effects and voice itself. The terminal
+version uses `pw-play`, `paplay` or `aplay` (`sudo apt install alsa-utils`);
+without one of them it's silent, with text callouts.
 
 **Pi tip (terminal version):** on HDMI audio with plain ALSA, only one sound
-can play at a time, so speech may cut out while music plays. Install
+can play at a time, so the voice may cut out while music plays. Install
 PipeWire (`sudo apt install pipewire-audio`) or press `1` to turn music off.
+
+To re-record the voice (another Kokoro voice, speed, or new lines), see
+`tools/make_voice.py`.
 
 ## Running without installing
 
@@ -103,5 +111,7 @@ python3 volcano_gfx.py --autoplay --window; echo $?    # prints 0
 | `volcano.py` | Terminal version: flags, curses, main loop |
 | `render.py`, `sprites.py` | Terminal version drawing |
 | `audio.py` | Sound synthesis, music, effects, speech |
+| `voice.py`, `voice/` | Pre-recorded guide voice (Kokoro, af_heart) and how callouts map to clips |
 | `test_game.py` | Unit tests for `game.py` |
 | `tools/make_assets.py` | Rebuilds `assets/*.png` from SVG (needs `rsvg-convert` + Pillow) |
+| `tools/make_voice.py` | Re-records `voice/*.wav` with Kokoro (needs `kokoro-onnx`, run on a PC) |
