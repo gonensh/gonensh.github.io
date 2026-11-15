@@ -149,6 +149,7 @@
   .ctlBtn:active{background:rgba(255,255,255,.65)}
   #ctlLeft,#ctlRight{width:104px;height:104px;font-size:40px}
   #ctlJump{width:140px;height:140px;font-size:19px}
+  #ctlThrow{width:96px;height:96px;font-size:34px}
 
   /* high-contrast variant, enabled with ?contrast=high */
   body.hc{background:#000;background-image:none}
@@ -207,6 +208,10 @@
       <li><b>Jump:</b> ↑, W, Space, or Z</li>
       <li><b>Run:</b> hold Ctrl while moving to sprint</li>
       <li><b>Throw snowballs:</b> X, or tap ❄ — needed to take down the Ice King boss!</li>
+      <li><b>Wings</b> (blue block): press jump in the air to flap and fly; hold it to glide down slowly</li>
+      <li><b>Fire hat</b> (orange block): press X, or tap 🔥, to throw bouncing fireballs</li>
+      <li><b>Ouch!</b> Touching an enemy knocks you flying — you lose your power-up, or shrink</li>
+      <li><b>Frozen Peak is slippery:</b> start slowing down early!</li>
       <li><b>Mute/unmute music:</b> press M, or tap 🔊</li>
       <li><b>Defeat enemies</b> by bouncing on top of them</li>
       <li><b>Collect stars</b> and hit <b>?</b> blocks for bonuses</li>
@@ -247,6 +252,7 @@
       <button class="ctlBtn" id="ctlRight" aria-label="Move right">▶</button>
     </div>
     <div class="ctlZone">
+      <button class="ctlBtn" id="ctlThrow" aria-label="Throw">🔥</button>
       <button class="ctlBtn" id="ctlJump" aria-label="Jump">JUMP</button>
     </div>
   </div>
@@ -305,9 +311,13 @@ const SPRINT_MULT = 1.55;   // holding Control sprints past the normal top speed
 const JUMP_V = -14.5, JUMP_CUT = 0.42;
 const STOMP_V = -10;
 const COYOTE = 8, BUFFER = 8;
+const ICE_ACC = 0.35, ICE_FRIC = 0.07;   // Frozen Peak: much less grip, long slides
+const FLAP_V = -7.6, GLIDE_MAX = 2.4;    // wings: each jump press in the air flaps; holding glides
+const KNOCK_VX = 7.5, KNOCK_VY = -7.5, KNOCK_T = 24;   // the "power punch" when an enemy hits you
+const FIRE_V = 6.5, FIRE_BOUNCE = -5.6, FIRE_MAX = 3;  // fire hat fireballs
 
 /* ---------------- tiles ---------------- */
-const SOLID = '=b?!unc';
+const SOLID = '=b?!uncWF';
 const isSolid  = ch => SOLID.indexOf(ch) >= 0;
 const isSemi   = ch => ch === '-';
 const isHazard = ch => ch === '^' || ch === '~';
@@ -357,6 +367,8 @@ function buildLevel(name, theme, width, fn){
     brick(c0,c1,r){ for(let c=c0;c<=c1;c++) set(c,r,'b'); },
     q(c,r){ set(c,r,'?'); },
     snack(c,r){ set(c,r,'!'); },
+    wings(c,r){ set(c,r,'W'); },
+    fire(c,r){ set(c,r,'F'); },
     stump(c,rTop){ set(c,rTop,'n'); set(c+1,rTop,'n');
                    for(let r=rTop+1;r<ROWS;r++){ set(c,r,'n'); set(c+1,r,'n'); } },
     stars(c0,c1,r){ for(let c=c0;c<=c1;c++) set(c,r,'o'); },
@@ -398,7 +410,7 @@ buildLevel('Sunny Hills', 'grass', 132, g => {
   g.ground(0,22,11);
   g.stars(6,8,10);
   g.blob(16,10);
-  g.brick(9,9,7); g.q(10,7); g.snack(12,7); g.brick(13,13,7);
+  g.brick(9,9,7); g.q(10,7); g.snack(12,7); g.wings(13,7);
   g.stars(9,13,4);
 
   g.ground(26,46,11);
@@ -408,7 +420,7 @@ buildLevel('Sunny Hills', 'grass', 132, g => {
 
   g.ground(50,74,11);
   g.cp(52,10);
-  g.q(56,7); g.brick(57,58,7); g.q(59,7);
+  g.q(56,7); g.brick(57,57,7); g.fire(58,7); g.q(59,7);
   g.blob(63,10);
   g.fly(66,5);
   g.cloud(68,72,7); g.stars(68,72,6);
@@ -431,7 +443,7 @@ buildLevel('Cloud Hopper', 'sky', 138, g => {
   g.ground(0,14,11);
   g.stars(4,6,10);
   g.blob(10,10);
-  g.q(8,7); g.brick(9,9,7);
+  g.wings(8,7); g.brick(9,9,7);
 
   g.plank(18,22,9); g.stars(18,22,8);
   g.cloud(26,29,8); g.fly(27,5);
@@ -478,7 +490,7 @@ buildLevel('Volcano Rumble', 'volcano', 140, g => {
   g.mover(39,9,3,'h',4,1.4);
   g.ground(44,62,11);
   g.cp(46,10);
-  g.brick(50,50,7); g.q(51,7); g.q(52,7); g.brick(53,53,7); g.stars(50,53,5);
+  g.brick(50,50,7); g.q(51,7); g.wings(52,7); g.brick(53,53,7); g.stars(50,53,5);
   g.blob(57,10);
   g.cp(60,10);
   g.fly(61,5);
@@ -516,7 +528,7 @@ buildLevel('Frozen Peak', 'ice', 128, g => {
   g.cp(26,10);
   g.fly(30,5);
   g.blob(36,10);
-  g.brick(40,41,7); g.q(41,7); g.stars(38,43,6);
+  g.brick(40,40,7); g.fire(41,7); g.stars(38,43,6);
 
   g.ground(50,74,11);
   g.cp(52,10);
@@ -578,7 +590,10 @@ const SFX = {
   hurt:  () => seq([[440],[330],[220]], 0.08),
   cp:    () => seq([[784],[1046]], 0.09),
   win:   () => seq([[523],[659],[784],[1046],[784],[1046],[1318,0.4]], 0.12),
-  over:  () => seq([[392],[330],[262],[196,0.4]], 0.16)
+  over:  () => seq([[392],[330],[262],[196,0.4]], 0.16),
+  flap:  () => tone(520, 0.1, 'triangle', 0.12, 880),
+  fire:  () => tone(760, 0.12, 'sawtooth', 0.1, 260),
+  punch: () => { tone(150, 0.16, 'square', 0.16, 55); tone(90, 0.2, 'sine', 0.22, 40); }
 };
 
 const MEL = [523,0,659,0,784,0,659,0, 587,0,698,0,880,0,698,0,
@@ -603,19 +618,20 @@ let state = 'title';   // title | play | cleared | dead | gameover | victory
 let li = 0, level = LEVELS[0], theme = themeOf('grass');
 let cam = 0, tick = 0, screenT = 0, shake = 0;
 let hearts = 3, stars = 0, totalStars = 0;
-let enemies = [], items = [], parts = [], pops = [], bumps = [], movers = [], snowballs = [];
+let enemies = [], items = [], parts = [], pops = [], bumps = [], movers = [], snowballs = [], fireballs = [];
 let respawn = {x:0, y:0};
 
 const player = {
   x:0, y:0, w:26, h:34, vx:0, vy:0,
   onGround:false, big:false, face:1, run:0,
   coyote:0, buffer:0, invuln:0, anim:'idle', standing:null, dead:false, deadT:0, danceT:0,
-  throwCd:0, bossHp:5
+  throwCd:0, bossHp:5,
+  power:null, knockT:0, flapT:0, flapping:false   // power: null | 'wings' | 'fire'
 };
 
 const keys = {};
 const localInput = { left:false, right:false, jump:false, sprint:false, throw:false };
-const remoteInput = { left:false, right:false, jump:false, sprint:false };
+const remoteInput = { left:false, right:false, jump:false, sprint:false, throw:false };
 const input = { left:false, right:false, jump:false, jumpPrev:false, sprint:false, throw:false };
 
 /* ============================================================
@@ -629,7 +645,7 @@ function loadLevel(i, keepStars){
   level.live = level.grid.map(row => row.slice());
   movers = level.movers.map(m => ({...m}));
   enemies = level.meta.spawns.map(s => makeEnemy(s));
-  items = []; parts = []; pops = []; bumps = []; snowballs = [];
+  items = []; parts = []; pops = []; bumps = []; snowballs = []; fireballs = [];
   if(!keepStars) stars = 0;
   respawn = { x: level.meta.start.c*TILE, y: level.meta.start.r*TILE };
   level.meta.checkpoints.forEach(c => c.hit = false);
@@ -645,7 +661,8 @@ function resetPlayer(full){
   player.invuln = full ? 0 : 90;
   player.standing = null;
   player.bossHp = 5; player.throwCd = 0;
-  snowballs = [];
+  player.power = null; player.knockT = 0; player.flapT = 0; player.flapping = false;
+  snowballs = []; fireballs = [];
   if(full){ player.big = false; sizePlayer(); }
 }
 function sizePlayer(){
@@ -750,7 +767,7 @@ function update(){
   input.right = localInput.right || remoteInput.right;
   input.jump = localInput.jump || remoteInput.jump;
   input.sprint = localInput.sprint || remoteInput.sprint;
-  input.throw = localInput.throw;
+  input.throw = localInput.throw || remoteInput.throw;
   tick++;
   if(shake > 0) shake--;
 
@@ -785,6 +802,7 @@ function update(){
     player.deadT++;
     player.vy = Math.min(MAXFALL, player.vy + GRAV);
     player.y += player.vy;
+    player.x += player.vx;          // knocked flying by the punch
     updateParticles();
     if(player.deadT > 70){
       if(hearts <= 0){ state = 'gameover'; screenT = 0; SFX.over(); }
@@ -798,6 +816,8 @@ function update(){
   updateMovers();
   updateEnemies();
   updateSnowballs();
+  updateFireballs();
+  if(typeof syncThrowButton === 'function') syncThrowButton();
   updateItems();
   updateParticles();
 
@@ -813,9 +833,13 @@ function updatePlayer(){
   const p = player;
   if(p.invuln > 0) p.invuln--;
   if(p.throwCd > 0) p.throwCd--;
-  if(input.throw && p.throwCd <= 0 && level.meta.hasBoss){
-    throwPlayerSnowball();
-    p.throwCd = 20;
+  if(input.throw && p.throwCd <= 0){
+    if(p.power === 'fire'){
+      if(fireballs.length < FIRE_MAX){ throwFireball(); p.throwCd = 14; }
+    } else if(level.meta.hasBoss){
+      throwPlayerSnowball();
+      p.throwCd = 20;
+    }
   }
 
   // carry along a moving platform
@@ -824,29 +848,48 @@ function updatePlayer(){
 
   const slick = level.theme === 'ice';
   const sprinting = input.sprint;
-  const acc = (sprinting ? ACC * 1.3 : ACC) * (slick ? 0.6 : 1);
-  const fric = slick ? FRIC * 0.28 : FRIC;
+  const acc = (sprinting ? ACC * 1.3 : ACC) * (slick ? ICE_ACC : 1);
+  const fric = slick ? FRIC * ICE_FRIC : FRIC;
   const maxRun = (p.big ? RUN_B : RUN_S) * (sprinting ? SPRINT_MULT : 1);
-  if(input.left && !input.right){ p.vx -= acc; p.face = -1; }
-  else if(input.right && !input.left){ p.vx += acc; p.face = 1; }
-  else {
-    if(p.vx > fric) p.vx -= fric;
-    else if(p.vx < -fric) p.vx += fric;
-    else p.vx = 0;
+  if(p.knockT > 0){
+    // reeling from a hit: no steering for a moment, just slow down
+    p.knockT--;
+    p.vx *= p.onGround ? (slick ? 0.97 : 0.86) : 0.985;
+  } else {
+    if(input.left && !input.right){ p.vx -= acc; p.face = -1; }
+    else if(input.right && !input.left){ p.vx += acc; p.face = 1; }
+    else {
+      if(p.vx > fric) p.vx -= fric;
+      else if(p.vx < -fric) p.vx += fric;
+      else p.vx = 0;
+    }
+    p.vx = Math.max(-maxRun, Math.min(maxRun, p.vx));
   }
-  p.vx = Math.max(-maxRun, Math.min(maxRun, p.vx));
+  // ice spray while skidding
+  if(slick && p.onGround && Math.abs(p.vx) > 1.5 && tick % 4 === 0 &&
+     !(input.right && p.vx > 0) && !(input.left && p.vx < 0)){
+    puff(p.x + p.w/2, p.y + p.h - 2, '#ffffff', 2, 2);
+  }
 
   // jump: coyote time + input buffering makes it forgiving for small hands
   if(input.jump && !input.jumpPrev) p.buffer = BUFFER;
   if(p.buffer > 0) p.buffer--;
   if(p.coyote > 0) p.coyote--;
   if(p.buffer > 0 && p.coyote > 0){
-    p.vy = JUMP_V; p.buffer = 0; p.coyote = 0; p.onGround = false;
+    p.vy = JUMP_V; p.buffer = 0; p.coyote = 0; p.onGround = false; p.flapping = false;
     SFX.jump();
+  } else if(p.power === 'wings' && input.jump && !input.jumpPrev && p.coyote <= 0 && p.knockT <= 0){
+    // wings: every jump press in the air is another flap
+    p.vy = Math.min(p.vy, FLAP_V); p.buffer = 0; p.flapping = true; p.flapT = 14;
+    SFX.flap();
+    puff(p.x + p.w/2, p.y + p.h*0.45, '#ffffff', 3, 3);
   }
-  if(!input.jump && p.vy < -4) p.vy *= JUMP_CUT;
+  if(p.flapT > 0) p.flapT--;
+  if(p.vy >= 0) p.flapping = false;
+  if(!input.jump && p.vy < -4 && !p.flapping && p.knockT <= 0) p.vy *= JUMP_CUT;
 
   p.vy = Math.min(MAXFALL, p.vy + GRAV);
+  if(p.power === 'wings' && input.jump && p.vy > GLIDE_MAX) p.vy = GLIDE_MAX;   // hold jump to glide
   moveBody(p, true);
 
   if(p.onGround){
@@ -901,15 +944,16 @@ function updatePlayer(){
 
 function hitBlock(c,r){
   const ch = tile(c,r);
-  if(ch === '?' || ch === '!'){
+  if(ch === '?' || ch === '!' || ch === 'W' || ch === 'F'){
     setTile(c,r,'u');
     bumps.push({c, r, t:14});
     if(ch === '?'){
       stars++; SFX.star(); pop(c*TILE, r*TILE-6, '+1');
       puff(c*TILE+20, r*TILE-4, '#ffd23f', 9, 4);
     } else {
-      items.push({ type:'snack', x:c*TILE+6, y:r*TILE-28, w:28, h:28,
-                   vx:1.3, vy:-3, born:0 });
+      const type = ch === '!' ? 'snack' : ch === 'W' ? 'wings' : 'fire';
+      items.push({ type, x:c*TILE+6, y:r*TILE-28, w:28, h:28,
+                   vx: type === 'fire' ? 0 : 1.3, vy:-3, born:0 });
       SFX.grow();
     }
   } else if(ch === 'b'){
@@ -985,7 +1029,7 @@ function updateEnemies(){
         pop(e.x, e.y - 8, '+1');
         puff(e.x + e.w/2, e.y + e.h/2, e.type === 'fly' ? '#ff9d4d' : '#a06bff', 12, 5);
       } else if(p.invuln <= 0){
-        hurt();
+        hurt(e.x + e.w/2);
       }
     }
   }
@@ -1040,17 +1084,18 @@ function updateSnowballs(){
       }
     } else if(state === 'play' && !player.dead && player.invuln <= 0 && overlap(box, player)){
       snowballs.splice(i, 1);
-      bossHitPlayer();
+      bossHitPlayer(s.vx >= 0 ? 1 : -1);
     }
   }
 }
-function bossHitPlayer(){
+function bossHitPlayer(dir){
   const p = player;
   p.invuln = 80; shake = 8; SFX.hurt();
   puff(p.x + p.w/2, p.y + p.h/2, '#bfe9ff', 12, 5);
   p.bossHp = Math.max(0, (p.bossHp || 0) - 1);
   pop(p.x, p.y - 10, '-1');
-  if(p.bossHp <= 0) die();
+  if(p.bossHp <= 0) die(dir);
+  else knockBack(dir);
 }
 function defeatBoss(e){
   e.dead = 1;
@@ -1068,7 +1113,7 @@ function updateItems(){
     it.born++;
     if(it.born < 22){ it.y -= 1.3; }      // pop out of the block
     else {
-      it.vy = Math.min(MAXFALL, it.vy + GRAV);
+      it.vy = Math.min(it.type === 'wings' ? 1.2 : MAXFALL, it.vy + GRAV);   // wings flutter down
       moveBody(it, false);
       if(it.hitWall) it.vx = -it.vx;
     }
@@ -1077,8 +1122,12 @@ function updateItems(){
       items.splice(i,1);
       if(!p.big){ p.big = true; sizePlayer(); }
       stars += 3;
-      SFX.grow(); pop(p.x, p.y - 10, 'POWER UP!');
-      puff(p.x + p.w/2, p.y + p.h/2, '#ff5fa2', 18, 6);
+      if(it.type === 'wings' || it.type === 'fire') p.power = it.type;
+      SFX.grow();
+      pop(p.x, p.y - 10, it.type === 'wings' ? 'WINGS! JUMP IN THE AIR TO FLY'
+                       : it.type === 'fire' ? 'FIRE HAT! PRESS X FOR FIREBALLS' : 'POWER UP!');
+      puff(p.x + p.w/2, p.y + p.h/2,
+           it.type === 'wings' ? '#bfe9ff' : it.type === 'fire' ? '#ff9d4d' : '#ff5fa2', 18, 6);
     }
   }
 }
@@ -1098,24 +1147,98 @@ function updateParticles(){
   }
 }
 
-function hurt(){
+// fromX: where the hit came from, so Danny flies away from it
+function hurt(fromX){
   const p = player;
-  if(p.big){
+  const dir = fromX === undefined ? -p.face : (p.x + p.w/2 < fromX ? -1 : 1);
+  if(p.power){
+    // a power-up soaks up the hit (Danny stays big)
+    p.power = null; p.invuln = 100;
+    SFX.hurt(); knockBack(dir);
+  } else if(p.big){
     p.big = false; sizePlayer(); p.invuln = 100;
     SFX.hurt(); shake = 8;
     puff(p.x + p.w/2, p.y + p.h/2, '#ffffff', 14, 6);
+    knockBack(dir);
   } else {
-    die();
+    die(dir);
   }
 }
-function die(){
+// the enemy "power-punches" Danny: he's thrown up and away, can't steer for a moment
+function knockBack(dir){
+  const p = player;
+  p.vx = dir * KNOCK_VX; p.vy = KNOCK_VY; p.knockT = KNOCK_T;
+  p.onGround = false; p.coyote = 0; p.buffer = 0; p.standing = null; p.flapping = false;
+  shake = 12; SFX.punch();
+  punchFx(dir);
+}
+function punchFx(dir){
+  const p = player;
+  const hx = p.x + p.w/2 - dir*p.w*0.6, hy = p.y + p.h*0.45;
+  puff(hx, hy, '#ffd23f', 10, 7);
+  puff(hx, hy, '#ffffff', 6, 5);
+  pop(hx, p.y - 26, 'POW!');
+}
+function die(dir){
   if(state !== 'play') return;
   hearts--;
   state = 'dead';
   player.dead = true; player.deadT = 0;
-  player.vy = -9; player.vx = 0;
+  player.vy = -9; player.vx = dir ? dir * 4.5 : 0;
+  player.power = null; player.knockT = 0;
   SFX.hurt(); shake = 10;
+  if(dir){ SFX.punch(); punchFx(dir); }
   puff(player.x + player.w/2, player.y + player.h/2, '#ffffff', 16, 6);
+}
+
+/* ============================================================
+   FIREBALLS — thrown with the fire hat; they bounce along the ground
+   ============================================================ */
+function throwFireball(){
+  const p = player;
+  fireballs.push({ x: p.x + (p.face > 0 ? p.w + 2 : -2), y: p.y + p.h*0.45,
+                   vx: FIRE_V * p.face, vy: 1.5, r: 7, life: 160, spin: 0 });
+  SFX.fire();
+}
+function updateFireballs(){
+  for(let i = fireballs.length - 1; i >= 0; i--){
+    const f = fireballs[i];
+    f.life--; f.spin += 0.35;
+    f.vy = Math.min(9, f.vy + 0.5);
+    f.x += f.vx;
+    let burst = isSolid(tile(Math.floor((f.x + Math.sign(f.vx)*f.r) / TILE), Math.floor(f.y / TILE)));
+    f.y += f.vy;
+    if(!burst){
+      const c = Math.floor(f.x / TILE);
+      if(f.vy > 0){
+        const r = Math.floor((f.y + f.r) / TILE);
+        const t = tile(c, r);
+        if(isSolid(t) || isSemi(t)){ f.y = r*TILE - f.r; f.vy = FIRE_BOUNCE; }
+      } else if(isSolid(tile(c, Math.floor((f.y - f.r) / TILE)))){
+        f.vy = 1;
+      }
+    }
+    if(burst || f.life <= 0 || f.y > VH + 50 || f.x < cam - 60 || f.x > cam + VW + 60){
+      if(burst) puff(f.x, f.y, '#ff9d4d', 6, 3);
+      fireballs.splice(i, 1);
+      continue;
+    }
+    const box = { x: f.x - f.r, y: f.y - f.r, w: f.r*2, h: f.r*2 };
+    for(const e of enemies){
+      if(e.dead || !overlap(box, e)) continue;
+      if(e.type === 'iceking'){
+        e.hp--; e.hitFlash = 12; shake = 4; SFX.stomp();
+        puff(e.x + e.w/2, e.y + e.h/2, '#ff9d4d', 10, 5);
+        if(e.hp <= 0) defeatBoss(e);
+      } else {
+        e.dead = 1; stars += 1; SFX.stomp();
+        pop(e.x, e.y - 8, '+1');
+        puff(e.x + e.w/2, e.y + e.h/2, '#ff9d4d', 12, 5);
+      }
+      fireballs.splice(i, 1);
+      break;
+    }
+  }
 }
 
 /* ============================================================
@@ -1156,7 +1279,7 @@ function text(str, x, y, size, color, align, outline){
 /* ============================================================
    DANNY — drawn from shapes, animated
    ============================================================ */
-function drawDanny(x, y, w, h, face, anim, t){
+function drawDanny(x, y, w, h, face, anim, t, opts){
   const s = h / 34;                       // scale relative to small size
   const cx = x + w/2, bottom = y + h;
   const bob = anim === 'idle' ? Math.sin(t*0.09)*1.2 : 0;
@@ -1171,6 +1294,12 @@ function drawDanny(x, y, w, h, face, anim, t){
   ctx.globalAlpha = 0.18; ctx.fillStyle = '#000';
   ctx.beginPath(); ctx.ellipse(0, 2, w*0.44, 4.5, 0, 0, 7); ctx.fill();
   ctx.globalAlpha = 1;
+
+  // wings sprout from behind the shoulders
+  if(opts && opts.wings !== undefined){
+    ctx.save(); ctx.translate(-3*s, -21*s); drawWing(-1, s*1.15, opts.wings); ctx.restore();
+    ctx.save(); ctx.translate(3*s, -21*s); drawWing(1, s*1.15, opts.wings); ctx.restore();
+  }
 
   const legY = -10*s, legH = 11*s, legW = 6.5*s;
   const shoeC = '#ff4d6d';
@@ -1234,6 +1363,7 @@ function drawDanny(x, y, w, h, face, anim, t){
   ctx.closePath();
   ctx.fillStyle = '#4a2c18'; ctx.fill();
   ctx.lineWidth = 2.2; ctx.strokeStyle = ink; ctx.stroke();
+  if(opts && opts.hat) drawHelmet(0, hy, s);
 
   // eyes + smile
   ctx.fillStyle = ink;
@@ -1266,6 +1396,7 @@ function render(){
   drawItems();
   drawEnemies();
   drawSnowballs();
+  drawFireballs();
   drawPlayer();
   drawParticles();
   drawHUD();
@@ -1401,6 +1532,17 @@ function drawTile(ch, x, y, c, r){
       text(ch === '?' ? '?' : '★', x+TILE/2, y+TILE/2+1, 22, '#ffffff', 'center', '#7a4a00');
       break;
     }
+    case 'W': case 'F': {
+      const glow = 0.5 + Math.sin(tick*0.11 + c)*0.5;
+      fillRR(x+2, y+2, TILE-4, TILE-4, 7, ch === 'W' ? '#5cc8ff' : '#ff7a3d',
+             ch === 'W' ? '#1f5f8a' : '#7a2a00');
+      ctx.globalAlpha = 0.25 + glow*0.35;
+      fillRR(x+6, y+6, TILE-12, TILE-12, 5, '#ffffff');
+      ctx.globalAlpha = 1;
+      if(ch === 'W') drawWingPair(x+TILE/2, y+TILE/2+3, 0.7, 0.45);
+      else drawFlame(x+TILE/2, y+TILE/2+2, 1.0);
+      break;
+    }
     case 'u': {
       fillRR(x+2, y+2, TILE-4, TILE-4, 7, '#9c7c52', '#6b5233');
       break;
@@ -1505,6 +1647,18 @@ function drawMovers(){
 function drawItems(){
   for(const it of items){
     const x = it.x - cam;
+    if(it.type === 'wings'){
+      drawWingPair(x + it.w/2, it.y + it.h/2 + 2, 0.8, 0.35 + Math.sin(tick*0.25)*0.45);
+      continue;
+    }
+    if(it.type === 'fire'){
+      ctx.globalAlpha = 0.35 + Math.sin(tick*0.15)*0.15;
+      ctx.fillStyle = '#ffd23f';
+      ctx.beginPath(); ctx.arc(x + it.w/2, it.y + it.h/2, 17, 0, 7); ctx.fill();
+      ctx.globalAlpha = 1;
+      drawHelmet(x + it.w/2, it.y + it.h/2 + 9, 1.4);
+      continue;
+    }
     fillRR(x, it.y, it.w, it.h, 9, '#ff5fa2', '#2b1a45');
     ctx.fillStyle = '#fff';
     ctx.beginPath(); ctx.arc(x+9, it.y+11, 3.4, 0, 7); ctx.arc(x+19, it.y+11, 3.4, 0, 7); ctx.fill();
@@ -1513,6 +1667,78 @@ function drawItems(){
     ctx.strokeStyle = '#2b1a45'; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.arc(x+14, it.y+17, 4.5, 0.2, Math.PI-0.2); ctx.stroke();
   }
+}
+
+function drawFireballs(){
+  for(const f of fireballs){
+    ctx.save();
+    ctx.translate(f.x - cam, f.y); ctx.rotate(f.spin);
+    starPath(0, 0, f.r + 4, f.r - 1, 0);
+    ctx.fillStyle = '#ff5a1f'; ctx.fill();
+    ctx.beginPath(); ctx.arc(0, 0, f.r - 1, 0, 7); ctx.fillStyle = '#ffb02e'; ctx.fill();
+    ctx.beginPath(); ctx.arc(-1, -1, f.r - 4, 0, 7); ctx.fillStyle = '#fff3b0'; ctx.fill();
+    ctx.restore();
+  }
+}
+
+/* one feathered wing, root at the origin, reaching out to `side` (-1 / 1);
+   lift (radians) raises the tip */
+function drawWing(side, s, lift){
+  const ink = '#2b1a45';
+  ctx.save();
+  ctx.scale(side, 1);
+  ctx.rotate(-lift);
+  // three feathers fanning out from the root, longest on top
+  const F = [[0, 20, 7.5, -0.28], [1.5, 16.5, 7, 0.22], [3, 12.5, 6.5, 0.7]];
+  for(let i = F.length - 1; i >= 0; i--){
+    const [fy, len, th, tilt] = F[i];
+    ctx.save();
+    ctx.rotate(tilt);
+    ctx.beginPath();
+    ctx.ellipse(len/2*s, fy*s, len/2*s, th/2*s, 0, 0, 7);
+    ctx.fillStyle = ['#ffffff', '#eef8ff', '#d4ecff'][i];
+    ctx.fill();
+    ctx.lineWidth = 2; ctx.strokeStyle = ink; ctx.stroke();
+    ctx.restore();
+  }
+  ctx.restore();
+}
+function drawWingPair(cx, cy, s, lift){
+  ctx.save(); ctx.translate(cx - 2*s, cy); drawWing(-1, s, lift); ctx.restore();
+  ctx.save(); ctx.translate(cx + 2*s, cy); drawWing(1, s, lift); ctx.restore();
+}
+function drawFlame(cx, cy, s){
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - 13*s);
+  ctx.bezierCurveTo(cx + 7*s, cy - 5*s, cx + 9*s, cy + 2*s, cx + 6*s, cy + 7*s);
+  ctx.quadraticCurveTo(cx, cy + 11*s, cx - 6*s, cy + 7*s);
+  ctx.bezierCurveTo(cx - 9*s, cy + 2*s, cx - 5*s, cy - 4*s, cx, cy - 13*s);
+  ctx.fillStyle = '#ffd23f'; ctx.fill();
+  ctx.lineWidth = 2; ctx.strokeStyle = '#7a2a00'; ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(cx, cy + 3.5*s, 3.2*s, 4.6*s, 0, 0, 7);
+  ctx.fillStyle = '#fff6c8'; ctx.fill();
+}
+/* firefighter helmet sitting on a head centred at (cx, hy) */
+function drawHelmet(cx, hy, s){
+  const ink = '#2b1a45';
+  ctx.save();
+  ctx.translate(cx, hy);
+  ctx.lineWidth = 2.4; ctx.strokeStyle = ink;
+  // brim, longer at the back like a real fire helmet
+  ctx.beginPath(); ctx.ellipse(-1.5*s, -3*s, 12.8*s, 3.1*s, -0.08, 0, 7);
+  ctx.fillStyle = '#c81e28'; ctx.fill(); ctx.stroke();
+  // dome
+  ctx.beginPath(); ctx.arc(0, -3.6*s, 8.9*s, Math.PI, Math.PI*2); ctx.closePath();
+  ctx.fillStyle = '#ff3b3b'; ctx.fill(); ctx.stroke();
+  // ridge on top
+  ctx.fillStyle = '#ff8a7a'; ctx.fillRect(-1.1*s, -12*s, 2.2*s, 7.5*s);
+  // gold shield badge at the front
+  const bx = 3*s, by = -8.2*s;
+  ctx.beginPath();
+  ctx.moveTo(bx - 3*s, by - 2.6*s); ctx.lineTo(bx + 3*s, by - 2.6*s); ctx.lineTo(bx + 3*s, by + 0.6*s);
+  ctx.quadraticCurveTo(bx, by + 3.8*s, bx - 3*s, by + 0.6*s); ctx.closePath();
+  ctx.fillStyle = '#ffd23f'; ctx.fill(); ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.restore();
 }
 
 function drawSnowballs(){
@@ -1639,7 +1865,19 @@ function drawPlayer(){
   else if(Math.abs(p.vx) > 0.4) anim = 'run';
   p.run += Math.abs(p.vx) * 0.25;
   const t = anim === 'run' ? p.run * 4 : tick;
-  drawDanny(p.x - cam, p.y, p.w, p.h, p.face, anim, t);
+  drawDanny(p.x - cam, p.y, p.w, p.h, p.face, anim, t, playerLooks());
+}
+
+// what Danny is wearing: wing angle and the fire hat
+function playerLooks(){
+  const p = player;
+  const o = { hat: p.power === 'fire' };
+  if(p.power === 'wings'){
+    if(p.flapT > 0) o.wings = 0.35 + Math.sin((14 - p.flapT)/14 * Math.PI*2 + Math.PI/2) * 0.6;
+    else if(p.onGround) o.wings = 0.15 + Math.sin(tick*0.06) * 0.08;
+    else o.wings = input.jump && p.vy > 0 ? 0.8 : 0.4 + Math.sin(tick*0.2) * 0.1;
+  }
+  return o;
 }
 
 function drawParticles(){
@@ -1673,6 +1911,8 @@ function drawHUD(){
   starPath(140, 36, 11, 5, tick*0.02);
   ctx.fillStyle = '#ffd23f'; ctx.fill();
   text('×' + stars, 156, 37, 22, '#ffffff', 'left');
+  if(player.power === 'wings') drawWingPair(240, 40, 0.55, 0.45);
+  else if(player.power === 'fire') drawHelmet(240, 44, 0.85);
   text('LEVEL ' + (li+1), VW-24, 30, 19, '#ffffff', 'right', '#2b1a45');
   text(level.name, VW-24, 52, 15, '#ffe9a8', 'right', '#2b1a45');
   if(typeof Host !== 'undefined' && Host.connected){
@@ -1724,7 +1964,7 @@ function drawTitle(){
   const blink = Math.sin(tick*0.09) > -0.3;
   if(blink) text('Press any button or tap to start', leftX, 388, 20, '#ffffff', 'center', '#2b1a45');
   text('← → to move   •   ↑ to jump   •   hold Ctrl to run', leftX, 424, 15, '#ffffff', 'center', '#2b1a45');
-  text('bounce on enemies to defeat them!', leftX, 448, 13.5, '#ffe9a8', 'center', '#2b1a45');
+  text('bounce on enemies • find wings and fire hats!', leftX, 448, 13.5, '#ffe9a8', 'center', '#2b1a45');
   text('tap ❓ for full instructions', leftX, 470, 12, '#ffe9a8', 'center', '#2b1a45');
   drawPhonePanel();
 }
@@ -1882,6 +2122,15 @@ bindTouch(document.getElementById('bL'), 'left');
 bindTouch(document.getElementById('bR'), 'right');
 bindTouch(document.getElementById('bJ'), 'jump');
 bindTouch(document.getElementById('bS'), 'throw');
+const throwBtn = document.getElementById('bS');
+function syncThrowButton(){
+  const fire = player.power === 'fire';
+  const label = fire ? '🔥' : '❄';
+  if(throwBtn.textContent !== label){
+    throwBtn.textContent = label;
+    throwBtn.setAttribute('aria-label', fire ? 'Throw fireball' : 'Throw snowball');
+  }
+}
 
 const pad = document.getElementById('pad');
 const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -2004,7 +2253,7 @@ const Host = {
     this.conn = c;
     c.on('open', () => {
       this.connected = true;
-      remoteInput.left = remoteInput.right = remoteInput.jump = false;
+      remoteInput.left = remoteInput.right = remoteInput.jump = remoteInput.throw = false;
       this.lastMsgAt = performance.now();
       setLinkStatus('📱 Connected! You can close this window and play.');
       this.startWatchdog();
@@ -2016,12 +2265,12 @@ const Host = {
   onData(d){
     if(!d || typeof d !== 'object') return;
     this.lastMsgAt = performance.now();
-    if(d.t === 'in'){ remoteInput.left = !!d.l; remoteInput.right = !!d.r; remoteInput.jump = !!d.j; }
+    if(d.t === 'in'){ remoteInput.left = !!d.l; remoteInput.right = !!d.r; remoteInput.jump = !!d.j; remoteInput.throw = !!d.x; }
   },
   onLost(){
     if(!this.connected) return;
     this.connected = false;
-    remoteInput.left = remoteInput.right = remoteInput.jump = false;
+    remoteInput.left = remoteInput.right = remoteInput.jump = remoteInput.throw = false;
     clearInterval(this.watchdog);
     setLinkStatus('📱 Phone disconnected. Reopen this to reconnect.');
   },
@@ -2044,7 +2293,7 @@ bindTap(linkNewCode, () => {
   if(Host.conn && Host.conn.open) Host.conn.close();
   if(Host.peer) Host.peer.destroy();
   Host.peer = null; Host.connected = false;
-  remoteInput.left = remoteInput.right = remoteInput.jump = false;
+  remoteInput.left = remoteInput.right = remoteInput.jump = remoteInput.throw = false;
   Host.ensurePeer();
 });
 
@@ -2101,7 +2350,7 @@ const Controller = {
       setCtlStatus('Disconnected. Check the code and try again.');
     }
   },
-  send(s){ if(this.conn && this.conn.open) this.conn.send({ t:'in', l:s.left, r:s.right, j:s.jump }); },
+  send(s){ if(this.conn && this.conn.open) this.conn.send({ t:'in', l:s.left, r:s.right, j:s.jump, x:s.throw }); },
   startHeartbeat(){
     clearInterval(this.hbTimer);
     this.hbTimer = setInterval(() => { if(this.conn && this.conn.open) this.conn.send({ t:'hb' }); }, 1000);
@@ -2113,7 +2362,7 @@ const Controller = {
   }
 };
 
-const ctlState = { left:false, right:false, jump:false };
+const ctlState = { left:false, right:false, jump:false, throw:false };
 function ctlBind(el, key){
   const on  = e => { e.preventDefault(); ctlState[key] = true; Controller.send(ctlState); if(navigator.vibrate) navigator.vibrate(15); };
   const off = e => { e.preventDefault(); ctlState[key] = false; Controller.send(ctlState); };
@@ -2127,6 +2376,7 @@ function ctlBind(el, key){
 ctlBind(document.getElementById('ctlLeft'), 'left');
 ctlBind(document.getElementById('ctlRight'), 'right');
 ctlBind(document.getElementById('ctlJump'), 'jump');
+ctlBind(document.getElementById('ctlThrow'), 'throw');
 
 if(ctlCodeInput) ctlCodeInput.addEventListener('input', () => {
   ctlCodeInput.value = ctlCodeInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);

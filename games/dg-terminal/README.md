@@ -39,13 +39,24 @@ To uninstall:
 | Move | ← → or A D | stick or d-pad |
 | Jump (hold for higher) | ↑, Space, W or Z | A / B |
 | Run fast | hold Ctrl or Shift | shoulder buttons |
-| Throw a snowball (Ice King level) | X | X / Y |
+| Throw a fireball (with the fire hat) or a snowball (Ice King level) | X | X / Y |
 | Start / continue | any key | any button |
 | Music on/off | M | |
 | Quit (asks first) | Esc | |
 
 Bounce on enemies to beat them, hit **?** blocks for stars and the pink
-**★** blocks for a power-up. Checkpoint flags save your place.
+**★** blocks to grow big. Checkpoint flags save your place.
+
+**Power-ups** (they make Danny big too):
+- **Wings** (blue block): press jump in the air to flap and fly; hold it to
+  glide down slowly.
+- **Fire hat** (orange block): a firefighter's helmet. Press X to throw
+  fireballs that bounce along the ground. They beat any enemy, and hurt the
+  Ice King too.
+
+Touching an enemy is a **power punch**: Danny is knocked flying and can't
+steer for a moment. He loses his power-up (or shrinks, if he has none).
+**Frozen Peak** is slippery, so start slowing down early.
 
 ## Graphics version options
 
@@ -73,7 +84,7 @@ height.
 Most terminals only tell a program when a key is *pressed*, not when it's
 let go. So in the terminal version a tap walks a short way and holding a key
 keeps walking (the keyboard's auto-repeat does that), jumps are always full
-height, and Shift + ← → runs. Press ↓ to stop at once. In terminals that
+height (tap again quickly to flap the wings), and Shift + ← → runs. Press ↓ to stop at once. In terminals that
 support the kitty keyboard protocol (kitty, foot, WezTerm, Ghostty, recent
 Alacritty) the game notices and the keys work exactly like the graphics
 version, Ctrl included.
